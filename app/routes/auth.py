@@ -12,13 +12,16 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
 
-        # Fetch user from DB
         user = query("SELECT * FROM users WHERE email=%s", (email,), fetchone=True)
 
         if user and bcrypt.check_password_hash(user["password"], password):
             user_obj = UserWrapper(user["id"], user["name"], user["email"], user["role"])
             login_user(user_obj)
-            return redirect(url_for("complaints.list_complaints"))
+
+            if user["role"] == "admin":
+                return redirect(url_for("admin.admin_home"))
+            else:
+                return redirect(url_for("complaints.list_complaints"))
 
         return "Invalid credentials"
 

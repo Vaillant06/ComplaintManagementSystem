@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
@@ -25,9 +25,10 @@ def create_app():
             return UserWrapper(user["id"], user["name"], user["email"], user["role"])
         return None
     
-    from app.routes import auth, complaints, admin
+    from app.routes import auth, complaints, admin, home
     app.register_blueprint(auth.bp)
     app.register_blueprint(complaints.bp)
     app.register_blueprint(admin.bp)
+    app.register_blueprint(home.bp)
 
     return app
