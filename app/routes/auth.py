@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, login_required, current_user
 from app.db import query
 from app import bcrypt
 from app.user_wrapper import UserWrapper
@@ -27,7 +27,7 @@ def register():
         hashed_password = bcrypt.generate_password_hash(password).decode()
 
         query(
-            "insert into users(name, email, password, role) values (%s %s %s)",
+            "insert into users(name, email, password) values (%s, %s, %s)",
             (name, email, hashed_password),
             commit=True
         )
@@ -51,7 +51,7 @@ def login():
             if user["role"] == "admin":
                 return redirect(url_for("admin.admin_home"))
             else:
-                return redirect(url_for("complaints.list_complaints"))
+                return redirect(url_for("user.user_dashboard"))
 
         flash("Invalid credentials!", "alert")
 
@@ -59,7 +59,12 @@ def login():
 
 
 @bp.route("/logout")
+@login_required
 def logout():
+    if current_user.role == "admin":
+        flash("Admin logout successful!", "success")
+    else:
+        flash("Logout successful!", "success")
+        
     logout_user()
-    flash("Admin Logout Successful!", "success")
     return redirect(url_for("auth.login"))

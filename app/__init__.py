@@ -25,10 +25,11 @@ def create_app():
             return UserWrapper(user["id"], user["name"], user["email"], user["role"])
         return None
     
-    from app.routes import auth, complaints, admin, home
+    from app.routes import auth, complaints, admin, home, user
     app.register_blueprint(auth.bp)
     app.register_blueprint(complaints.bp)
     app.register_blueprint(admin.bp)
     app.register_blueprint(home.bp)
+    app.register_blueprint(user.bp)
 
     return app

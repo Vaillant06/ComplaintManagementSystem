@@ -2,7 +2,7 @@
 {% block content %}
 <div class="form col-md-4 offset-md-4 p-5">
     <h3>Welcome Admin</h3>
-    <a href="{{ url_for('complaints.list_complaints') }}">View Complaints</a>
+    <a href="{{ url_for('admin.admin_complaints') }}">View Complaints</a>
     <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Logout</a>
     <div class="flash-messages text-center mt-3">
         {% with messages = get_flashed_messages(with_categories=True) %}

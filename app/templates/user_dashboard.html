@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>User Profile</h3>
+<a href="/complaints/" class="btn btn-primary">View Your complaints</a>
+<a href="/complaints/new" class="btn btn-danger">File a new complaint</a> 
+<a href="/auth/logout" class="btn btn-danger">Logout</a>
+<div class="flash-messages text-center mt-3">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="{{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div> 
+{% endblock %}
