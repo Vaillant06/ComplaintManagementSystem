@@ -1,13 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
-<h3>My Complaints</h3>
-<a href="/complaints/new" class="btn btn-success mb-3">New</a>
+<h3>Complaints</h3>
 {% if complaints %}
 <table class="table">
-<thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Created</th></tr></thead>
+<thead><tr><th>ID</th><th>User ID</th><th>Title</th><th>Status</th><th>Created</th></tr></thead>
 <tbody>
 {% for c in complaints %}
-<tr><td>{{c.id}}</td><td>{{c.title}}</td><td>{{c.status}}</td><td>{{c.created_at}}</td></tr>
+<tr><td>{{c.id}}</td><td>{{c.user_id}}</td><td>{{c.title}}</td><td>{{c.status}}</td><td>{{c.created_at}}</td></tr>
 {% endfor %}
 </tbody>
 </table>

@@ -10,7 +10,57 @@
     font-weight: 700;
 }
 
+header {
+    background-color: rgb(65, 217, 255);
+}
 
 body {
     font-family: 'Poppins', sans-serif;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.nav-link {
+    color: white;
+    border-radius: 12px;
+    transition: 0.3s ease-in;
+}
+
+.nav-link:hover {
+    background-color: white;
+    color: rgb(65, 217, 255);
+    border-bottom: 1px sold white;
+    border-radius: 12px;
+    transition: 0.3s ease-out;
+}
+
+.redirection {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.form {
+    background-color: rgb(243, 251, 253);
+    border: 1px solid rgb(211, 210, 210);
+    border-radius: 30px;
+    margin-top: 200px;
+}
+
+.btn {
+    border-radius: 12px;
+    width: 75%;
+}
+
+.alert {
+    color: red;
+}
+
+.success {
+    color: green;
 }

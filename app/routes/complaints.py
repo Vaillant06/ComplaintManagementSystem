@@ -8,9 +8,8 @@ bp = Blueprint("complaints", __name__, url_prefix="/complaints")
 @login_required
 def list_complaints():
     rows = query(
-        "SELECT * FROM complaints WHERE user_id=%s ORDER BY id DESC",
-        (current_user.id,),
-        fetchall=True
+        "select * from complaints order by created_at",
+        fetchall = True
     )
     return render_template("complaints.html", complaints=rows)
 
