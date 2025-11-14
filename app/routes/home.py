@@ -1,5 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
-from flask_login import current_user
+from flask import Blueprint, render_template
 
 bp = Blueprint("home", __name__)
 
