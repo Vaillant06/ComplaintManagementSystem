@@ -1,10 +1,24 @@
 {% extends 'base.html' %}
 {% block content %}
-<h3>Submit Complaint</h3>
-<form method="POST">
-  <div class="mb-3"><label>Title</label><input name="title" class="form-control" required></div>
-  <div class="mb-3"><label>Description</label><textarea name="description" class="form-control" rows="5" required></textarea></div>
-  <button class="btn btn-primary">Submit</button>
-</form>
-<a href="/auth/"></a>
+  <h3 class=" text-center m-5">Submit Complaint</h3>
+  <form method="POST">
+    <div class="mb-3">
+      <label>Title</label>
+      <input name="title" class="form-control mt-1" required>
+    </div>
+    <div class="mb-3">
+      <label>Department</label>
+      <select name="department_id" class="form-select mt-1" required>
+        {% for d in departments %}
+          <option value="{{ d.id }}">{{ d.name }}</option>
+        {% endfor %}
+    </select>
+    </div>
+    <div class="mb-3">
+      <label>Description</label>
+      <textarea name="description" class="form-control mt-1" rows="5" required></textarea>
+    </div>
+    <button class="btn btn-primary">Submit</button>
+  </form>
+  <a href="{{ url_for('user.user_dashboard') }}" class="btn btn-secondary mt-3">Back</a>
 {% endblock %}

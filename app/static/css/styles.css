@@ -46,16 +46,34 @@ body {
 }
 
 .form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     background-color: rgb(243, 251, 253);
     border: 1px solid rgb(211, 210, 210);
     border-radius: 30px;
     margin-top: 200px;
+    width: max-content;
 }
 
 .btn {
     border-radius: 12px;
-    width: 75%;
+    width:200px;
 }
+
+.badge {
+    width: 100px;
+}
+
+table thead th {
+    font-weight: 600;
+}
+
+.table td, .table th {
+    text-align: center;
+    padding: 14px 12px;
+}
+
 
 .alert {
     color: red;

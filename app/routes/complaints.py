@@ -16,16 +16,25 @@ def list_complaints():
 @bp.route("/new", methods=["GET", "POST"])
 @login_required
 def new_complaint():
-    if request.method == "POST" and current_user == "user":
+
+    departments = query("SELECT id, name FROM departments", fetchall=True)
+
+    if request.method == "POST" and current_user.role == "user":
+
         title = request.form["title"]
+        department_id = request.form["department_id"]
         description = request.form["description"]
 
         query(
-            "INSERT INTO complaints (user_id, title, description) VALUES (%s, %s, %s)",
-            (current_user.id, title, description),
+            """
+            INSERT INTO complaints (user_id, department_id, title, description)
+            VALUES (%s, %s, %s, %s)
+            """,
+            (current_user.id, department_id, title, description),
             commit=True
         )
 
         return redirect(url_for("user.user_dashboard"))
 
-    return render_template("new_complaint.html")
+    return render_template("new_complaint.html", departments=departments)
+

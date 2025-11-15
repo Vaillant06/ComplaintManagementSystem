@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container form mt-5">
+        <h4 class="text-center m-5">Update Status for Complaint #{{ complaint.id }}</h4>
+
+        <form method="POST">
+            <div class="mb-4 mx-3">
+                <label>Status</label>
+                <select name="status" class="form-select">
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+            <div class="redirection">
+                <button class="btn btn-success mb-2">Save</button>
+                <a class="btn btn-danger mb-5" href="{{ url_for('admin.admin_complaints') }}">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

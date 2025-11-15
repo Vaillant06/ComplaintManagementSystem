@@ -1,9 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="form col-md-4 offset-md-4 p-5">
-    <h3>Welcome Admin</h3>
-    <a href="{{ url_for('admin.admin_complaints') }}">View Complaints</a>
-    <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Logout</a>
+    <h3 class="text-center mb-3">Welcome, Admin</h3>
+    <div class="redirection mt-3">
+        <a href="{{ url_for('admin.admin_complaints') }}" class="btn btn-primary m-2">
+            <i class="bi bi-list-task"></i>
+             View Complaints
+        </a>
+        <a href="{{ url_for('admin.complaints_summary') }}" class="btn btn-secondary">
+            <i class="bi bi-folder"></i>
+            View Summary</a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-danger m-2">
+            <i class="bi bi-box-arrow-right me-2"></i>
+            Logout
+        </a>
+    </div>
     <div class="flash-messages text-center mt-3">
         {% with messages = get_flashed_messages(with_categories=True) %}
             {% if messages %}

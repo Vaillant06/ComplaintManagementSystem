@@ -1,26 +1,23 @@
 import psycopg2
 import psycopg2.extras
-from flask import current_app, g
-
-def get_db():
-    if "db" not in g:
-        g.db = psycopg2.connect(current_app.config["DATABASE_URL"])
-    return g.db
+from flask import current_app
 
 def query(sql, params=(), fetchone=False, fetchall=False, commit=False):
-    connection = get_db()
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute(sql, params)
+    conn = psycopg2.connect(current_app.config["DATABASE_URL"])
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    result = None
-    if fetchone:
-        result = cursor.fetchone()
-    elif fetchall:
-        result = cursor.fetchall()
+    try:
+        cur.execute(sql, params)
 
-    if commit:
-        connection.commit()
+        if commit:
+            conn.commit()
 
-    cursor.close()
+        if fetchone:
+            return cur.fetchone()
 
-    return result
+        if fetchall:
+            return cur.fetchall()
+
+    finally:
+        cur.close()
+        conn.close()
