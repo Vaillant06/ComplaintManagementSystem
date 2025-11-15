@@ -15,10 +15,10 @@
             <nav>
                 <ul class="nav">
                     <li class="nav-item">
-                        <a href="{{ url_for('home.home') }}" class="nav-link fw-bold">Home</a>
-                        <a href="#" class="nav-link fw-bold">About Us</a>
-                        <a href="#" class="nav-link fw-bold">Contact Us</a>
-                        <a href="/auth/login" class="nav-link fw-bold">Login</a>
+                        <a href="{{ url_for('home.home') }}" class="nav-link">Home</a>
+                        <a href="{{ url_for('complaints.new_complaint') }}" class="nav-link">File a Complaint</a>
+                        <a href="#" class="nav-link">Contact Us</a>
+                        <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
                     </li>
                 </ul>
             </nav>

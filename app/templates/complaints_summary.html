@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="summary m-5">
+        <h3 class="fw-bold text-center fs-2 m-3 p-3">COMPLAINTS SUMMARY</h3>
+        {% if pending or progress or resolved or rejected %}
+            <table class="table bg-light table-bordered mb-0">
+                <thead>
+                <tr>
+                    <th><span class="btn btn-sm btn-warning fw-bold">PENDING</span></th>
+                    <th><span class="btn btn-sm btn-info fw-bold">IN PROGRESS</span></th>
+                    <th><span class="btn btn-sm btn-success fw-bold">RESOLVED</span></th>
+                    <th><span class="btn btn-sm btn-danger fw-bold">REJECTED</span></th>
+                    <th><span class="btn btn-sm btn-dark fw-bold">TOTAL</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                    <td class="fw-bold fs-2 m-5 p-5">{{ pending }}</td>
+                    <td class="fw-bold fs-2 m-5 p-5">{{ progress }}</td>
+                    <td class="fw-bold fs-2 m-5 p-5">{{ resolved }}</td>
+                    <td class="fw-bold fs-2 m-5 p-5">{{ rejected }}</td>
+                    <td class="fw-bold fs-2 m-5 p-5">{{  total }}</td>
+                </tbody>
+            </table>
+        {% else %}
+            <p>No filed complaints</p>
+        {% endif %}
+
+        <a href="{{ url_for ('admin.admin_complaints') }}" class="btn btn-info  my-3">View Complaints</a>
+        <a href="{{ url_for('admin.admin_home') }}" class="btn btn-secondary mb-3">Back</a>
+
+        <div class="flash-messages text-center mt-3">
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+{% endblock %}

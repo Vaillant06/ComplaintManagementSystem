@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.db import query
 
@@ -16,7 +16,9 @@ def list_complaints():
 @bp.route("/new", methods=["GET", "POST"])
 @login_required
 def new_complaint():
-
+    if current_user.role != "user":
+        return "Only users can file a complaint!"
+    
     departments = query("SELECT id, name FROM departments", fetchall=True)
 
     if request.method == "POST" and current_user.role == "user":

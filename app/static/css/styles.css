@@ -38,11 +38,31 @@ body {
     transition: 0.3s ease-out;
 }
 
+.user-dahsboard {
+    background-color: green;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sidebar {
+    border-right: 2px solid black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .redirection {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.summary {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .form {
