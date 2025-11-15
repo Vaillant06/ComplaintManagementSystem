@@ -14,9 +14,21 @@ bp = Blueprint("admin", __name__, url_prefix="/admin")
 def admin_home():
     if current_user.role != "admin":
         abort(403)
-        
-    flash("Admin login successful", "success")
-    return render_template("admin_dashboard.html")
+    
+    admin = query(
+        "SELECT last_login FROM users WHERE id=%s",
+        (current_user.id,),
+        fetchone=True
+    )
+
+
+    last_login = admin["last_login"]
+
+    if last_login:
+        last_login = (last_login + timedelta(hours=5, minutes=30))\
+                        .strftime("%H:%M  |  %d-%m-%Y")
+
+    return render_template("admin_dashboard.html", last_login=last_login)
 
 
 # -----------------------------

@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="form col-md-4 offset-md-4 p-5">
-    <h3 class="text-center mb-3">Welcome, Admin</h3>
+    <h3 class="text-center mb-3 fs-2">Welcome, Admin</h3>
+    <p class="text-center text-muted fs-6">Last Login: <span class="text-success">{{ last_login }}</span></p>
     <div class="redirection mt-3">
         <a href="{{ url_for('admin.admin_complaints') }}" class="btn btn-primary m-2">
             <i class="bi bi-list-task"></i>

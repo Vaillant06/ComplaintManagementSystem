@@ -3,6 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app.db import query
 from app import bcrypt
 from app.user_wrapper import UserWrapper
+from datetime import datetime
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -36,6 +37,7 @@ def register():
     
     return render_template("register.html")
 
+
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -43,6 +45,12 @@ def login():
         password = request.form["password"]
 
         user = query("SELECT * FROM users WHERE email=%s", (email,), fetchone=True)
+
+        query(
+            "UPDATE users SET last_login = NOW() WHERE id = %s",
+            (user["id"],),
+            commit=True
+        )
 
         if user and bcrypt.check_password_hash(user["password"], password):
             user_obj = UserWrapper(user["id"], user["name"], user["email"], user["role"])
