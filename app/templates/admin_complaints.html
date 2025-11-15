@@ -29,7 +29,10 @@
 
                 </select>
 
-                <button class="btn btn-light btn-sm p-2">Filter</button>
+                <button class="btn btn-light btn-sm p-2">
+                    <i class="bi bi-sliders2"></i>
+                    Filter
+                </button>
             </form>
         </div>
 
@@ -79,12 +82,14 @@
                                 class="btn btn-sm btn-outline-secondary"
                                 data-bs-toggle="modal"
                                 data-bs-target="#complaintModal{{ c.id }}">
+                                <i class="bi bi-eye"></i>
                                 View
                             </button>
                         </td>
                         <td class="text-end">
                             <a href="{{ url_for('admin.edit_status', complaint_id=c.id) }}"
                             class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil-square"></i>
                                 Change
                             </a>
                         </td>
@@ -101,7 +106,10 @@
     </div>
 
     <div class="d-flex justify-content-end px-3 ">
-        <a href="{{ url_for('admin.admin_home') }}" class="btn btn-danger mt-3 px-3">Back</a>
+        <a href="{{ url_for('admin.admin_home') }}" class="btn btn-secondary mt-3 px-3">
+            <i class="bi bi-arrow-left"></i>
+            Back
+        </a>
     </div>
 
     <div class="flash-messages text-center mt-3">

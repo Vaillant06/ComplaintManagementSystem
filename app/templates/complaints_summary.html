@@ -25,8 +25,14 @@
             <p>No filed complaints</p>
         {% endif %}
 
-        <a href="{{ url_for ('admin.admin_complaints') }}" class="btn btn-info  my-3">View Complaints</a>
-        <a href="{{ url_for('admin.admin_home') }}" class="btn btn-secondary mb-3">Back</a>
+        <a href="{{ url_for ('admin.admin_complaints') }}" class="btn btn-info  my-3">
+            <i class="bi bi-eye"></i>
+            View Complaints
+        </a>
+        <a href="{{ url_for('admin.admin_home') }}" class="btn btn-secondary mb-3">
+            <i class="bi bi-arrow-left"></i>
+            Back
+        </a>
 
         <div class="flash-messages text-center mt-3">
             {% with messages = get_flashed_messages(with_categories=True) %}

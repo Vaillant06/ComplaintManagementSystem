@@ -1,6 +1,17 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
 {% block content %}
-<h1>This is the landing page</h1>
-<a href="{{ url_for('auth.login') }}" class="btn btn-success">Login</a>
-<a href="{{ url_for('auth.register') }}">Register</a>
+<div class="form landing-page text-center p-5">
+    <h1>Welcome to Complaint Management System</h1>
+    <p >Easily submit, track, and manage complaints with our efficient online portal.</p>
+    <div class="redirection mt-3">
+        <a href="{{ url_for('auth.login') }}" class="btn btn-success">
+        <i class="bi bi-box-arrow-in-right"></i> Login
+        </a>
+
+        <a href="{{ url_for('auth.register') }}" class="mt-3">
+            Register
+        </a>
+    </div>
+</div>
 {% endblock %}

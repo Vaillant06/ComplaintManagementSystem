@@ -38,18 +38,21 @@ body {
     transition: 0.3s ease-out;
 }
 
-.user-dahsboard {
-    background-color: green;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+.sidebar {
+    min-height: 100vh;
+    border-right: 1px solid black;
 }
 
-.sidebar {
-    border-right: 2px solid black;
+.user-info {
+    margin-left: 10px;
+    border-bottom: 1px solid black;
+    font-size: 18px;
+}
+
+.user-info button {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    border-radius: 12px;
+    padding: 20px;
 }
 
 .redirection {
@@ -76,6 +79,10 @@ body {
     width: max-content;
 }
 
+.landing-page {
+    margin-left: 150px;
+}
+
 .btn {
     border-radius: 12px;
     width:200px;
@@ -91,7 +98,7 @@ table thead th {
 
 .table td, .table th {
     text-align: center;
-    padding: 14px 12px;
+    padding: 16px 14px;
 }
 
 
