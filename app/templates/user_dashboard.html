@@ -63,8 +63,31 @@
                 </form>
             </div>
             {% if complaints %}
-                <table class="table mt-3">
-                    <thead><tr><th>Title</th><th>Status</th><th>Created</th><th>Assigned To</th><th>Admin Comments</th></tr></thead>
+                <table class="table table-bordered mt-3">
+                    <thead>
+                        <tr class="bg-dark text-white text-center">
+                            <th>
+                                <i class="bi bi-journal-text"></i>
+                                Title
+                            </th>
+                            <th>
+                                <i class="bi bi-check-circle"></i>
+                                Status
+                            </th>
+                            <th>
+                                <i class="bi bi-clock"></i>
+                                Created
+                            </th>
+                            <th>
+                                <i class="bi bi-person-badge"></i>
+                                Assigned To
+                            </th>
+                            <th>
+                                <i class="bi bi-chat-left-text"></i>
+                                Admin Comments
+                            </th>
+                        </tr>
+                    </thead>
                     <tbody>
                         {% for c in complaints %}
                             <tr>
