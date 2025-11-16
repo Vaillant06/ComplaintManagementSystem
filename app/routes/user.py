@@ -23,10 +23,10 @@ def user_dashboard():
             FROM complaints c
             JOIN users u ON c.user_id = u.id
             JOIN departments d ON d.id = c.department_id
-            WHERE c.status = %s
+            WHERE c.status = %s and c.user_id = %s
             ORDER BY c.created_at DESC
             """,
-            (status,),
+            (status, current_user.id,),
             fetchall=True
         )
 
@@ -37,8 +37,10 @@ def user_dashboard():
             FROM complaints c
             JOIN users u ON c.user_id = u.id
             JOIN departments d ON d.id = c.department_id
+            WHERE c.user_id = %s
             ORDER BY c.created_at DESC
             """,
+            (current_user.id,),
             fetchall=True
         )
 

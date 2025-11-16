@@ -136,6 +136,7 @@
 
                     <p><strong>User:</strong> {{ c.user_name }}</p>
                     <p><strong>Title:</strong> {{ c.title }}</p>
+                    <p><strong>Department: </strong>{{ c.department_name }}</p>
 
                     <p><strong>Description:</strong><br>
                     {{ c.description }}</p>
@@ -164,7 +165,7 @@
                 </div>
                 <div class="modal-footer">
                     {% if c.status == "Pending" %}
-                        <a href="{{ url_for('admin.assign_complaint', complaint_id=c.id) }}"
+                        <a href="{{ url_for('admin.assign_complaint', complaint_id=c.id, department_id=c.department_id) }}"
                         class="btn btn-primary">
                             Assign 
                         </a>

@@ -7,7 +7,7 @@ bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
 # -----------------------------
-#       ADMIN DASHBOARD 
+#       ADMIN DASHBOARD
 # -----------------------------
 @bp.route("/")
 @login_required
@@ -58,7 +58,7 @@ def admin_complaints():
     else:
         rows = query(
             """
-            SELECT c.*, u.name AS user_name, d.name AS department_name
+            SELECT c.*, u.name AS user_name, d.id AS department_id, d.name AS department_name
             FROM complaints c
             JOIN users u ON c.user_id = u.id
             JOIN departments d ON d.id = c.department_id
@@ -133,12 +133,13 @@ def edit_status(complaint_id):
         return redirect(url_for("admin.admin_complaints"))
 
     comp = query("SELECT * FROM complaints WHERE id=%s", (complaint_id,), fetchone=True)
+
     return render_template("edit_status.html", complaint=comp)
 
 
-#------------------------------
+# ------------------------------
 #       ADMIN ADD COMMENT
-#------------------------------
+# ------------------------------
 @bp.route("/complaints/<int:complaint_id>/add_comment", methods=["POST"])
 @login_required
 def add_comment(complaint_id):
@@ -161,11 +162,17 @@ def add_comment(complaint_id):
 # -----------------------------
 #    ADMIN ASSIGN COMPLAINT
 # -----------------------------
-@bp.route("/complaints/<int:complaint_id>/assign", methods=["GET", "POST"])
+@bp.route("/complaints/<int:complaint_id>/<int:department_id>/assign", methods=["GET", "POST"])
 @login_required
-def assign_complaint(complaint_id, admin_comment):
+def assign_complaint(complaint_id, department_id):
     if current_user.role != "admin":
         abort(403)
+
+    staff_dept = query(
+        "SELECT dept_name FROM staff WHERE dept_id=%s",
+        (department_id,),
+        fetchone=True
+    )['dept_name']
 
     query(
         "UPDATE complaints SET status='In Progress' WHERE id=%s",
@@ -174,8 +181,8 @@ def assign_complaint(complaint_id, admin_comment):
     )
 
     query(
-        "UPDATE complaints SET assigned_to='staff' WHERE id=%s",
-        (complaint_id,),
+        "UPDATE complaints SET assigned_to=%s WHERE id=%s",
+        (staff_dept, complaint_id,),
         commit=True 
     )
 
