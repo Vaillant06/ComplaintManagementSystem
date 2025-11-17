@@ -46,6 +46,14 @@ def login():
 
         user = query("SELECT * FROM users WHERE email=%s", (email,), fetchone=True)
 
+        if user is None:
+            flash("Invalid credentials!", "alert")
+            return redirect(url_for("auth.login"))
+
+        if not bcrypt.check_password_hash(user["password"], password):
+            flash("Invalid email or password!", "alert")
+            return redirect(url_for("auth.login"))
+
         query(
             "UPDATE users SET last_login = NOW() WHERE id = %s",
             (user["id"],),

@@ -1,21 +1,27 @@
+<!-- ADMIN DASHBOARD -->
+
 {% extends 'base.html' %}
 {% block content %}
 <div class="form col-md-4 offset-md-4 p-5">
     <h3 class="text-center mb-3 fs-2">Welcome, Admin</h3>
     <p class="text-center text-muted fs-6">Last Login: <span class="text-success">{{ last_login }}</span></p>
+
+    <!-- ADMIN FUNCTIONALITY -->
     <div class="redirection mt-3">
         <a href="{{ url_for('admin.admin_complaints') }}" class="btn btn-primary m-2 p-2">
-            <i class="bi bi-list-task"></i>
+            <i class="bi bi-list-task me-1"></i>
              View Complaints
         </a>
         <a href="{{ url_for('admin.complaints_summary') }}" class="btn btn-secondary m-2 p-2">
-            <i class="bi bi-folder"></i>
+            <i class="bi bi-folder me-1"></i>
             View Summary</a>
         <a href="{{ url_for('auth.logout') }}" class="btn btn-danger m-2 p-2">
-            <i class="bi bi-box-arrow-right me-2"></i>
+            <i class="bi bi-box-arrow-right me-1"></i>
             Logout
         </a>
     </div>
+
+    <!-- FLASH MESSAGES-->
     <div class="flash-messages text-center mt-3">
         {% with messages = get_flashed_messages(with_categories=True) %}
             {% if messages %}
