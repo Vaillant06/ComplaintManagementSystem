@@ -7,10 +7,11 @@
             <div class="mb-4 mx-3">
                 <label>Status</label>
                 <select name="status" class="form-select">
-                    <option value="Pending">Pending</option>
+                    {% if complaint.status == "Pending" %}
+                        <option value="Pending">Pending</option>
+                    {% endif %}
                     <option value="In Progress">In Progress</option>
                     <option value="Resolved">Resolved</option>
-                    <option value="Rejected">Rejected</option>
                 </select>
             </div>
             <div class="redirection">
