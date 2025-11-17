@@ -36,6 +36,7 @@ def new_complaint():
             commit=True
         )
 
+        flash("Complaint filed successfully!", "success")
         return redirect(url_for("user.user_dashboard"))
 
     return render_template("new_complaint.html", departments=departments)

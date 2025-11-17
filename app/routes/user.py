@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, request
+from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
 from datetime import timedelta
 from app.db import query

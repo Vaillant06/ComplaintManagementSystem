@@ -58,7 +58,7 @@
                 <tbody>
                     {% for c in complaints %}
                     <tr>
-                        <td>{{ c.id }}</td>
+                        <td># {{ c.id }}</td>
                         <td>{{ c.user_id }}</td>
                         <td>{{ c.user_name }}</td>
                         <td>{{ c.title }}</td>
@@ -172,16 +172,20 @@
 
                         <!-- ADMIN COMMENT -->
                         <form method="POST" action="{{ url_for('admin.add_comment', complaint_id=c.id) }}">
-                            <div class="mb-2">
-                                <label for="admin_comment" class="form-label"><strong>Admin Comment</strong></label>
-                                <input id="admin_comment" type="text" name="admin_comment" class="form-control mt-1" value="{{ c.admin_comment or '' }}">
-                            </div>
                             {% if c.status == "Resolved" or c.status == "Rejected" %}
+                                <div class="mb-2">
+                                    <label for="admin_comment" class="form-label"><strong>Admin Comment</strong></label>
+                                    <input id="admin_comment" type="text" name="admin_comment" class="form-control mt-1" value="{{ c.admin_comment or '' }}" disabled>
+                                </div>
                                 <button type="submit" class="btn btn-success mt-1 disabled">
                                     <i class="bi bi-plus-lg me-1"></i>
                                     Add Comment
                                 </button>
                             {% else %}
+                                <div class="mb-2">
+                                    <label for="admin_comment" class="form-label"><strong>Admin Comment</strong></label>
+                                    <input id="admin_comment" type="text" name="admin_comment" class="form-control mt-1" value="{{ c.admin_comment or '' }}">
+                                </div>
                                 <button type="submit" class="btn btn-success mt-1">
                                     <i class="bi bi-plus-lg me-1"></i>
                                     Add Comment
@@ -198,7 +202,7 @@
                                 Assign 
                             </a>
                         {% endif %}
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
                             <i class="bi bi-x-circle me-1"></i>
                             Close
                         </button>

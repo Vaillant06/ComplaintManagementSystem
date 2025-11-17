@@ -18,6 +18,10 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+.container {
+    width: 1500px
+}
+
 .nav-item {
     display: flex;
     flex-direction: row;
