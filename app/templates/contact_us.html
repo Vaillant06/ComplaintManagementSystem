@@ -4,7 +4,7 @@
 {% block content %}
 <div>
     <form action="{{ url_for('contact.message') }}" method="POST">
-        <input type="text">
+        <input type="text" required>
         <button>submit</button>
     </form>
 </div>

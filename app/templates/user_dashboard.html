@@ -6,7 +6,7 @@
 
         <!-- SIDEBAR -->
         <div class="sidebar text-center col-sm-2"> 
-            <h3 class="my-4">USER PROFILE</h3>
+            <h3 class="my-3">USER PROFILE</h3>
             <div class="user-info">
                 <p><strong>{{ user.name }}</strong></p>
                 <p><strong>{{ user.email }}</strong></p>
@@ -117,7 +117,11 @@
             
             <!-- NO COMPLAINTS FOUND -->
             {% else %}
-                <h6 class="text-center text-muted mt-3">No {{ status }} complaints found.</h6>
+                {% if status %}
+                    <h6 class="text-center text-muted mt-3">No {{ status }} complaints found.</h6>
+                {% else %}
+                    <h6 class="text-center text-muted mt-3">No complaints found.</h6>
+                {% endif %}
             {% endif %} 
         </div>
     </div>
