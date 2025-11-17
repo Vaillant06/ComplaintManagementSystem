@@ -26,7 +26,7 @@ def admin_home():
 
     if last_login:
         last_login = (last_login + timedelta(hours=5, minutes=30))\
-                        .strftime("%H:%M  |  %d-%m-%Y")
+                        .strftime("%H:%M | %d-%m-%Y")
 
     return render_template("admin_dashboard.html", last_login=last_login)
 
@@ -55,6 +55,7 @@ def admin_complaints():
             (status,),
             fetchall=True
         )
+
     else:
         rows = query(
             """
@@ -67,12 +68,10 @@ def admin_complaints():
             fetchall=True
         )
 
-
     for c in rows:
         c["created_at"] = (c["created_at"] + timedelta(hours=5, minutes=30))\
                             .strftime("%H:%M | %d-%m-%Y")
 
-     
     return render_template("admin_complaints.html", complaints=rows, status=status)
 
 
@@ -129,6 +128,7 @@ def edit_status(complaint_id):
             (new_status, complaint_id),
             commit=True
         )
+
         flash("Status updated successfully!", "success")
         return redirect(url_for("admin.admin_complaints"))
 
@@ -155,7 +155,7 @@ def add_comment(complaint_id):
             commit=True
         )
 
-    flash("Comment added successfully", "success")
+    flash("Comment updated successfully", "success")
     return redirect(url_for("admin.admin_complaints"))
 
 
@@ -172,7 +172,7 @@ def assign_complaint(complaint_id, department_id):
         "SELECT dept_name FROM staff WHERE dept_id=%s",
         (department_id,),
         fetchone=True
-    )['dept_name']
+    )["dept_name"]
 
     query(
         "UPDATE complaints SET status='In Progress' WHERE id=%s",
