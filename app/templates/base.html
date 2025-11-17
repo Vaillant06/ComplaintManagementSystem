@@ -21,16 +21,16 @@
             <nav>
                 <ul class="nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="...">Home</a>
+                        <a class="nav-link" href="{{ url_for('home.home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="...">File a Complaint</a>
+                        <a class="nav-link" href="{{ url_for('complaints.new_complaint') }}">File a Complaint</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Contact Us</a>
+                        <a class="nav-link" href="{{ url_for('contact.contact_us') }}">Contact Us</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="...">Login</a>
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
                     </li>
                 </ul>
             </nav>
@@ -41,10 +41,21 @@
     <div class="container">
         {% block content %} {% endblock %}
     </div>
-    
+
     <!-- SPECIAL CONTAINER FOR DASHBOARD -->
     <div>
         {% block user_dashboard %} {% endblock %}
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    <div class="flash-messages text-center mt-3">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="{{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
     </div>
 
     <!-- JAVASCRIPT -->

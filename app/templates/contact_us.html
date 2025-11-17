@@ -1,0 +1,11 @@
+<!-- CONTACT US -->
+
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <form action="{{ url_for('contact.message') }}" method="POST">
+        <input type="text">
+        <button>submit</button>
+    </form>
+</div>
+{% endblock %}

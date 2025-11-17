@@ -41,7 +41,7 @@
         <!-- COMPLAINTS TABLE -->
         <div class="card-body p-0">
             {% if complaints %}
-            <table class="table table-hover table-striped mb-0">
+            <table class="table table-hover  mb-0">
                 <thead class="table-light">
                     <tr>
                         <th>ID</th>
@@ -125,17 +125,6 @@
         </a>
     </div>
 
-    <!-- FLASH MESSAGES -->
-    <div class="flash-messages text-center mt-3">
-        {% with messages = get_flashed_messages(with_categories=True) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <p class="{{ category }}">{{ message }}</p>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
-
     <!-- MODAL FOR VIEWING COMPLAINT STATUS -->
     {% for c in complaints %}
         <div class="modal fade" id="complaintModal{{ c.id }}" tabindex="-1">
@@ -176,10 +165,17 @@
                                 <label for="admin_comment" class="form-label"><strong>Admin Comment</strong></label>
                                 <input id="admin_comment" type="text" name="admin_comment" class="form-control mt-1" value="{{ c.admin_comment or '' }}">
                             </div>
-                            <button type="submit" class="btn btn-success btn-sm">
-                                <i class="bi bi-plus-lg me-1"></i>
-                                Add Comment
-                            </button>
+                            {% if c.status == "Resolved" or c.status == "Rejected" %}
+                                <button type="submit" class="btn btn-success mt-1 disabled">
+                                    <i class="bi bi-plus-lg me-1"></i>
+                                    Add Comment
+                                </button>
+                            {% else %}
+                                <button type="submit" class="btn btn-success mt-1">
+                                    <i class="bi bi-plus-lg me-1"></i>
+                                    Add Comment
+                                </button>
+                            {% endif %}
                         </form>
                     </div>
 

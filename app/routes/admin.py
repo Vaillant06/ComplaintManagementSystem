@@ -21,7 +21,6 @@ def admin_home():
         fetchone=True
     )
 
-
     last_login = admin["last_login"]
 
     if last_login:
@@ -68,11 +67,16 @@ def admin_complaints():
             fetchall=True
         )
 
+    total = query(
+        "SELECT count(*) FROM complaints",
+        fetchone=True
+    )[0]
+
     for c in rows:
         c["created_at"] = (c["created_at"] + timedelta(hours=5, minutes=30))\
                             .strftime("%H:%M | %d-%m-%Y")
 
-    return render_template("admin_complaints.html", complaints=rows, status=status)
+    return render_template("admin_complaints.html", complaints=rows, status=status, total=total)
 
 
 # -----------------------------
