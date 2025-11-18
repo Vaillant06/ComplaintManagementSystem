@@ -12,6 +12,9 @@
                 <p><strong>{{ user.email }}</strong></p>
                 <p class="text-muted">Last Login: <strong class="text-success">{{ user.last_login }}</strong></p>
             </div>
+            <div class="complaints my-3">
+                <h4 class="my-2">Total complaints : {{ total }}</h4>
+            </div>
             <div class="redirection mt-3">
                 <a href="/complaints/new" class="btn btn-warning mt-3">
                     <i class="bi bi-plus-circle me-1"></i>
@@ -83,7 +86,7 @@
                             </th>
                             <th>
                                 <i class="bi bi-clock me-1"></i>
-                                Created
+                                Filed At
                             </th>
                             <th>
                                 <i class="bi bi-person-badge me-1"></i>

@@ -48,6 +48,12 @@ def user_dashboard():
             fetchall=True
         )
 
+    total = query(
+        "SELECT count(*) FROM complaints WHERE user_id=%s",
+        (current_user.id,),
+        fetchone=True
+    )[0]
+
     for c in rows:
         c["created_at"] = (c["created_at"] + timedelta(hours=5, minutes=30))\
                             .strftime("%H:%M | %d-%m-%Y")
@@ -56,4 +62,4 @@ def user_dashboard():
         user["last_login"] = (user["last_login"] + timedelta(hours=5, minutes=30))\
                         .strftime("%H:%M  |  %d-%m-%Y")
     
-    return render_template("user_dashboard.html", complaints=rows, user=user, status=status)
+    return render_template("user_dashboard.html", complaints=rows, user=user, status=status, total=total)
