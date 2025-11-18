@@ -5,6 +5,10 @@ from app.db import query
 
 bp = Blueprint("user", __name__, url_prefix="/user")
 
+
+# -----------------------------
+#        USER DASHBOARD
+# -----------------------------
 @bp.route("/")
 @login_required
 def user_dashboard():

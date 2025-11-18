@@ -8,6 +8,9 @@ from datetime import datetime
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
+# -----------------------------
+#           REGISTER 
+# -----------------------------
 @bp.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -19,12 +22,12 @@ def register():
         if password != confirm_password:
             flash("Passwords do not match", "alert")
             return render_template("register.html")
-        
+
         existing_email = query("select * from users where email=%s", (email,), fetchone=True)
         if existing_email:
             flash("Email exists already", "alert")
             return render_template("register.html")
-        
+
         hashed_password = bcrypt.generate_password_hash(password).decode()
 
         query(
@@ -34,10 +37,13 @@ def register():
         )
 
         return redirect(url_for("auth.login"))
-    
+
     return render_template("register.html")
 
 
+# -----------------------------
+#            LOGIN 
+# -----------------------------
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -74,6 +80,9 @@ def login():
     return render_template("login.html")
 
 
+# -----------------------------
+#            LOGOUT 
+# -----------------------------
 @bp.route("/logout")
 @login_required
 def logout():

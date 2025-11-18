@@ -4,6 +4,10 @@ from app.db import query
 
 bp = Blueprint("complaints", __name__, url_prefix="/complaints")
 
+
+# -----------------------------
+#       LIST COMPLAINTS
+# -----------------------------
 @bp.route("/")
 @login_required
 def list_complaints():
@@ -13,6 +17,9 @@ def list_complaints():
         return redirect(url_for("user.user_dashboard"))
 
 
+# -----------------------------
+#      FILE NEW COMPLAINT
+# -----------------------------
 @bp.route("/new", methods=["GET", "POST"])
 @login_required
 def new_complaint():
@@ -40,4 +47,3 @@ def new_complaint():
         return redirect(url_for("user.user_dashboard"))
 
     return render_template("new_complaint.html", departments=departments)
-
