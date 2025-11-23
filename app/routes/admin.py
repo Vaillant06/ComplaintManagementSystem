@@ -12,11 +12,11 @@ bp = Blueprint("admin", __name__, url_prefix="/admin")
 @bp.route("/")
 @login_required
 def admin_home():
-    if current_user.role != "admin":
+    if not current_user.is_admin:
         abort(403)
     
     admin = query(
-        "SELECT last_login FROM users WHERE id=%s",
+        "SELECT last_login FROM admins WHERE admin_id=%s",
         (current_user.id,),
         fetchone=True
     )
@@ -36,7 +36,7 @@ def admin_home():
 @bp.route("/complaints", methods=["GET"])
 @login_required
 def admin_complaints():
-    if current_user.role != "admin":      
+    if not current_user.is_admin:      
         abort(403)
     
     status = request.args.get("status")
@@ -44,10 +44,10 @@ def admin_complaints():
     if status:
         rows = query(
             """
-            SELECT c.*, u.name AS user_name, d.name AS department_name
+            SELECT c.*, u.username, d.department_name
             FROM complaints c
-            JOIN users u ON c.user_id = u.id
-            JOIN departments d ON d.id = c.department_id
+            JOIN users u ON c.user_id = u.user_id
+            JOIN departments d ON d.department_id = c.department_id
             WHERE c.status = %s
             ORDER BY c.created_at DESC
             """,
@@ -58,10 +58,10 @@ def admin_complaints():
     else:
         rows = query(
             """
-            SELECT c.*, u.name AS user_name, d.id AS department_id, d.name AS department_name
+            SELECT c.*, u.username, d.department_id, d.department_name
             FROM complaints c
-            JOIN users u ON c.user_id = u.id
-            JOIN departments d ON d.id = c.department_id
+            JOIN users u ON c.user_id = u.user_id
+            JOIN departments d ON d.department_id = c.department_id
             ORDER BY c.created_at DESC
             """,
             fetchall=True
@@ -74,7 +74,7 @@ def admin_complaints():
 
     for c in rows:
         c["created_at"] = (c["created_at"] + timedelta(hours=5, minutes=30))\
-                            .strftime("%H:%M | %d-%m-%Y")
+                            .strftime("%H:%M | %d-%B-%Y")
 
     return render_template("admin_complaints.html", complaints=rows, status=status, total=total)
 
@@ -85,7 +85,7 @@ def admin_complaints():
 @bp.route("complaints_summary", methods=["GET", "POST"])
 @login_required
 def complaints_summary():
-    if current_user.role != "admin":
+    if not current_user.is_admin:
         abort(403)
 
     pending = query(
@@ -122,21 +122,30 @@ def complaints_summary():
 @bp.route("/complaints/<int:complaint_id>/status", methods=["GET", "POST"])
 @login_required
 def edit_status(complaint_id):
-    if current_user.role != "admin":
+    if not current_user.is_admin:
         abort(403)
 
     if request.method == "POST":
         new_status = request.form["status"]
         query(
-            "UPDATE complaints SET status=%s WHERE id=%s",
+            "UPDATE complaints SET status=%s WHERE complaint_id=%s",
             (new_status, complaint_id),
             commit=True
         )
 
+        if new_status == "Resolved":
+            query(
+                "UPDATE complaints SET admin_comment = %s WHERE complaint_id = %s",
+                ("Resolved the Issue", complaint_id),
+                commit=True
+            )
+
         flash("Status updated successfully!", "success")
         return redirect(url_for("admin.admin_complaints"))
 
-    comp = query("SELECT * FROM complaints WHERE id=%s", (complaint_id,), fetchone=True)
+    comp = query(
+        "SELECT * FROM complaints WHERE complaint_id=%s", (complaint_id,), fetchone=True
+    )
 
     return render_template("edit_status.html", complaint=comp)
 
@@ -147,14 +156,14 @@ def edit_status(complaint_id):
 @bp.route("/complaints/<int:complaint_id>/add_comment", methods=["POST"])
 @login_required
 def add_comment(complaint_id):
-    if current_user.role != "admin":
+    if not current_user.is_admin:
         abort(403)
-    
+
     if request.method == "POST":
         admin_comment = request.form["admin_comment"].strip()
 
         query(
-            "UPDATE complaints SET admin_comment=%s WHERE id=%s",
+            "UPDATE complaints SET admin_comment=%s WHERE complaint_id=%s",
             (admin_comment, complaint_id,),
             commit=True
         )
@@ -166,30 +175,31 @@ def add_comment(complaint_id):
 # -----------------------------
 #    ADMIN ASSIGN COMPLAINT
 # -----------------------------
-@bp.route("/complaints/<int:complaint_id>/<int:department_id>/assign", methods=["GET", "POST"])
+@bp.route(
+    "/complaints/<int:complaint_id>/<int:department_id>/assign", methods=["GET", "POST"]
+)
 @login_required
 def assign_complaint(complaint_id, department_id):
-    if current_user.role != "admin":
+    if not current_user.is_admin:
         abort(403)
 
-    staff_dept = query(
-        "SELECT dept_name FROM staff WHERE dept_id=%s",
+    staff = query(
+        "SELECT staff_id FROM staff WHERE department_id=%s LIMIT 1",
         (department_id,),
-        fetchone=True
-    )["dept_name"]
-
-    query(
-        "UPDATE complaints SET status='In Progress' WHERE id=%s",
-        (complaint_id,),
-        commit=True
+        fetchone=True,
     )
 
+    if not staff:
+        flash("No staff found in this department!", "danger")
+        return redirect(url_for("admin.admin_complaints"))
+
+    staff_id = staff["staff_id"]
+
     query(
-        "UPDATE complaints SET assigned_to=%s WHERE id=%s",
-        (staff_dept, complaint_id,),
-        commit=True 
+        "UPDATE complaints SET status='In Progress', assigned_to=%s, assigned_at=NOW() WHERE complaint_id=%s",
+        (staff_id, complaint_id),
+        commit=True,
     )
 
-    flash("Assigned task successfully!", "success")
-
+    flash("Complaint assigned successfully!", "success")
     return redirect(url_for("admin.admin_complaints"))

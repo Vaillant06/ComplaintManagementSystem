@@ -49,7 +49,7 @@
                         <th>Name</th>
                         <th>Title</th>
                         <th>Status</th>
-                        <th>Created</th>
+                        <th>Created At</th>
                         <th>Details</th>
                         <th>Action</th>
                     </tr>
@@ -58,9 +58,9 @@
                 <tbody>
                     {% for c in complaints %}
                     <tr>
-                        <td># {{ c.id }}</td>
+                        <td># {{ c.complaint_id }}</td>
                         <td>{{ c.user_id }}</td>
-                        <td>{{ c.user_name }}</td>
+                        <td>{{ c.username }}</td>
                         <td>{{ c.title }}</td>
                         <td>
                             {% if c.status == "Pending" %}
@@ -84,20 +84,20 @@
                             <button 
                                 class="btn btn-sm btn-outline-secondary"
                                 data-bs-toggle="modal"
-                                data-bs-target="#complaintModal{{ c.id }}">
+                                data-bs-target="#complaintModal{{ c.complaint_id }}">
                                 <i class="bi bi-eye"></i>
                                 View
                             </button>
                         </td>
                         <td class="text-end">
                             {% if c.status == "Rejected" or c.status == "Resolved" %}
-                                <a href="{{ url_for('admin.edit_status', complaint_id=c.id) }}"
+                                <a href="{{ url_for('admin.edit_status', complaint_id=c.complaint_id) }}"
                                 class="btn btn-sm btn-outline-primary disabled" >
                                     <i class="bi bi-pencil-square"></i>
                                     Change
                                 </a>
                             {% else %}
-                                <a href="{{ url_for('admin.edit_status', complaint_id=c.id) }}"
+                                <a href="{{ url_for('admin.edit_status', complaint_id=c.complaint_id) }}"
                                 class="btn btn-sm btn-outline-primary" >
                                     <i class="bi bi-pencil-square"></i>
                                     Change
@@ -111,9 +111,15 @@
 
             <!-- IF NO COMPLAINTS -->
             {% else %}
-                <div class="p-4 text-center">
-                    <h6 class="text-muted">No {{ status }} complaints</h6>
-                </div>
+                {% if status %}
+                    <div class="p-4 text-center">
+                        <h6 class="text-muted">No {{ status }} complaints</h6>
+                    </div>
+                {% else %}
+                    <div class="p-4 text-center">
+                        <h6 class="text-muted">No filed complaints</h6>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
     </div>
@@ -138,25 +144,25 @@
 
     <!-- MODAL FOR VIEWING COMPLAINT STATUS -->
     {% for c in complaints %}
-        <div class="modal fade" id="complaintModal{{ c.id }}" tabindex="-1">
+        <div class="modal fade" id="complaintModal{{ c.complaint_id }}" tabindex="-1">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
 
                     <div class="modal-header bg-info text-white">
-                        <h5 class="modal-title">Complaint #{{ c.id }}</h5>
+                        <h5 class="modal-title">Complaint #{{ c.complaint_id }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body">
 
-                        <p><strong>User:</strong> {{ c.user_name }}</p>
-                        <p><strong>Title:</strong> {{ c.title }}</p>
-                        <p><strong>Department: </strong>{{ c.department_name }}</p>
+                        <p><strong>User : </strong> {{ c.username }}</p>
+                        <p><strong>Title : </strong> {{ c.title }}</p>
+                        <p><strong>Department : </strong>{{ c.department_name }}</p>
 
-                        <p><strong>Description:</strong><br>
+                        <p><strong>Description: </strong><br>
                         {{ c.description }}</p>
 
-                        <p><strong>Status:</strong>
+                        <p><strong>Status : </strong>
                         {% if c.status == "Pending" %}
                             <span class="badge bg-warning text-dark">Pending</span>
                         {% elif c.status == "In Progress" %}
@@ -168,10 +174,10 @@
                         {% endif %}
                         </p>
 
-                        <p><strong>Created:</strong> {{ c.created_at }}</p>
+                        <p><strong>Created AT : </strong> {{ c.created_at }}</p>
 
                         <!-- ADMIN COMMENT -->
-                        <form method="POST" action="{{ url_for('admin.add_comment', complaint_id=c.id) }}">
+                        <form method="POST" action="{{ url_for('admin.add_comment', complaint_id=c.complaint_id) }}">
                             {% if c.status == "Resolved" or c.status == "Rejected" %}
                                 <div class="mb-2">
                                     <label for="admin_comment" class="form-label"><strong>Admin Comment</strong></label>
@@ -196,7 +202,7 @@
 
                     <div class="modal-footer">
                         {% if c.status == "Pending" %}
-                            <a href="{{ url_for('admin.assign_complaint', complaint_id=c.id, department_id=c.department_id) }}"
+                            <a href="{{ url_for('admin.assign_complaint', complaint_id=c.complaint_id, department_id=c.department_id) }}"
                             class="btn btn-primary">
                                 <i class="bi bi-person-check me-1"></i>
                                 Assign 

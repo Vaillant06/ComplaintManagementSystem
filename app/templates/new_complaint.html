@@ -14,7 +14,7 @@
 			<label>Department</label>
 			<select name="department_id" class="form-select mt-1" required>
 				{% for d in departments %}
-				<option value="{{ d.id }}">{{ d.name }}</option>
+				<option value="{{ d.department_id }}">{{ d.department_name }}</option>
 				{% endfor %}
 			</select>
 		</div>

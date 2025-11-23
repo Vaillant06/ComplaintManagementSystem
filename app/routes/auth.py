@@ -9,7 +9,7 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
 # -----------------------------
-#           REGISTER 
+#           REGISTER
 # -----------------------------
 @bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -31,7 +31,7 @@ def register():
         hashed_password = bcrypt.generate_password_hash(password).decode()
 
         query(
-            "insert into users(name, email, password) values (%s, %s, %s)",
+            "insert into users(username, email, password) values (%s, %s, %s)",
             (name, email, hashed_password),
             commit=True
         )
@@ -42,7 +42,7 @@ def register():
 
 
 # -----------------------------
-#            LOGIN 
+#            LOGIN
 # -----------------------------
 @bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -51,45 +51,48 @@ def login():
         password = request.form["password"]
 
         user = query("SELECT * FROM users WHERE email=%s", (email,), fetchone=True)
-
-        if user is None:
-            flash("Invalid credentials!", "alert")
-            return redirect(url_for("auth.login"))
-
-        if not bcrypt.check_password_hash(user["password"], password):
-            flash("Invalid email or password!", "alert")
-            return redirect(url_for("auth.login"))
-
-        query(
-            "UPDATE users SET last_login = NOW() WHERE id = %s",
-            (user["id"],),
-            commit=True
-        )
-
         if user and bcrypt.check_password_hash(user["password"], password):
-            user_obj = UserWrapper(user["id"], user["name"], user["email"], user["role"])
-            login_user(user_obj)
 
-            if user["role"] == "admin":
-                return redirect(url_for("admin.admin_home"))
-            else:
-                return redirect(url_for("user.user_dashboard"))
+            query(
+                "UPDATE users SET last_login = NOW() WHERE user_id = %s",
+                (user["user_id"],),
+                commit=True,
+            )
+
+            user_obj = UserWrapper(
+                user["user_id"], user["username"], user["email"], False
+            )
+            login_user(user_obj)
+            return redirect(url_for("user.user_dashboard"))
+
+        admin = query("SELECT * FROM admins WHERE email=%s", (email,), fetchone=True)
+        if admin and bcrypt.check_password_hash(admin["password"], password):
+
+            query(
+                "UPDATE admins SET last_login = NOW() WHERE admin_id = %s",
+                (admin["admin_id"],),
+                commit=True,
+            )
+
+            user_obj = UserWrapper(
+                admin["admin_id"], admin["admin_name"], admin["email"], True
+            )
+            login_user(user_obj)
+            return redirect(url_for("admin.admin_home"))
 
         flash("Invalid credentials!", "alert")
+        return redirect(url_for("auth.login"))
 
     return render_template("login.html")
 
 
 # -----------------------------
-#            LOGOUT 
+#            LOGOUT
 # -----------------------------
 @bp.route("/logout")
 @login_required
 def logout():
-    if current_user.role == "admin":
-        flash("Admin logout successful!", "success")
-    else:
-        flash("Logout successful!", "success")
-        
+    flash("Logout successful!", "success")
     logout_user()
+
     return redirect(url_for("auth.login"))

@@ -11,7 +11,7 @@ bp = Blueprint("complaints", __name__, url_prefix="/complaints")
 @bp.route("/")
 @login_required
 def list_complaints():
-    if current_user.role == "admin":
+    if current_user.is_admin:
         return redirect(url_for("admin.admin_complaints"))
     else:
         return redirect(url_for("user.user_dashboard"))
@@ -23,12 +23,12 @@ def list_complaints():
 @bp.route("/new", methods=["GET", "POST"])
 @login_required
 def new_complaint():
-    if current_user.role != "user":
+    if current_user.is_admin:
         return "Only users can file a complaint!"
     
-    departments = query("SELECT id, name FROM departments", fetchall=True)
+    departments = query("SELECT department_id, department_name FROM departments", fetchall=True)
 
-    if request.method == "POST" and current_user.role == "user":
+    if request.method == "POST" and not current_user.is_admin:
 
         title = request.form["title"]
         department_id = request.form["department_id"]

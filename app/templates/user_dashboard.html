@@ -8,9 +8,10 @@
         <div class="sidebar text-center col-sm-2"> 
             <h3 class="my-3">USER PROFILE</h3>
             <div class="user-info">
-                <p><strong>{{ user.name }}</strong></p>
+                <p><strong>{{ user.username }}</strong></p>
                 <p><strong>{{ user.email }}</strong></p>
-                <p class="text-muted">Last Login: <strong class="text-success">{{ user.last_login }}</strong></p>
+                <p class="text-muted">Last Login:</p>
+                <p><strong class="text-success">{{ user.last_login }}</strong></p>
             </div>
             <div class="complaints my-3">
                 <h4 class="my-2">Total complaints : {{ total }}</h4>
@@ -93,6 +94,10 @@
                                 Assigned To
                             </th>
                             <th>
+                                <i class="bi bi-clipboard-x me-1"></i>
+                                Assigned On
+                            </th>
+                            <th>
                                 <i class="bi bi-check-circle me-1"></i>
                                 Status
                             </th>   
@@ -107,10 +112,11 @@
                             <tr>
                                 <td>{{c.title}}</td>
                                 <td>{{c.created_at}}</td>
-                                {%if c.assigned_to %}
-                                    <td>{{c.assigned_to}} department staff</td>
+                                <td>{{c.assigned_to}}</td>
+                                {% if c.assigned_at %}
+                                    <td>{{ c.assigned_at }}</td>
                                 {% else %}
-                                    <td>{{c.assigned_to}}</td>
+                                    <td>---</td>
                                 {% endif %}
                                 <td>
                                     {% if c.status == "Pending" %}

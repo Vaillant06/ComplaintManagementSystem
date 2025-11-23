@@ -1,4 +1,4 @@
-from flask import Flask, redirect
+from flask import Flask
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
@@ -7,6 +7,7 @@ load_dotenv()
 
 login_manager = LoginManager()
 bcrypt = Bcrypt()
+
 
 def create_app():
     app = Flask(__name__)
@@ -18,14 +19,40 @@ def create_app():
     from app.db import query
     from app.user_wrapper import UserWrapper
 
+
+    @login_manager.user_loader
     @login_manager.user_loader
     def load_user(user_id):
-        user = query("SELECT * FROM users WHERE id=%s", (user_id,), fetchone=True)
+
+        admin = query(
+            "SELECT admin_id, admin_name, email FROM admins WHERE admin_id=%s",
+            (user_id,), fetchone=True
+        )
+        if admin:
+            return UserWrapper(
+                admin["admin_id"],
+                admin["admin_name"],
+                admin["email"],
+                True
+            )
+        
+        user = query(
+            "SELECT user_id, username, email FROM users WHERE user_id=%s",
+            (user_id,), fetchone=True
+        )
         if user:
-            return UserWrapper(user["id"], user["name"], user["email"], user["role"])
+            return UserWrapper(
+                user["user_id"],
+                user["username"],
+                user["email"],
+                False
+            )
+
         return None
 
+
     from app.routes import auth, complaints, admin, home, user, contact
+
     app.register_blueprint(auth.bp)
     app.register_blueprint(complaints.bp)
     app.register_blueprint(admin.bp)

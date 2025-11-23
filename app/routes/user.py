@@ -13,7 +13,7 @@ bp = Blueprint("user", __name__, url_prefix="/user")
 @login_required
 def user_dashboard():
     user = query(
-        "SELECT * FROM users WHERE id=%s",
+        "SELECT username, email, last_login FROM users WHERE user_id = %s",
         (current_user.id,),
         fetchone=True
     )
@@ -23,10 +23,10 @@ def user_dashboard():
     if status:
         rows = query(
             """
-            SELECT c.*, u.name AS user_name, d.name AS department_name
+            SELECT c.*, d.department_name
             FROM complaints c
-            JOIN users u ON c.user_id = u.id
-            JOIN departments d ON d.id = c.department_id
+            JOIN users u ON c.user_id = u.user_id
+            JOIN departments d ON d.department_id = c.department_id
             WHERE c.status = %s and c.user_id = %s
             ORDER BY c.created_at DESC
             """,
@@ -37,10 +37,10 @@ def user_dashboard():
     else:
         rows = query(
             """
-            SELECT c.*, u.name AS user_name, d.name AS department_name
+            SELECT c.*, d.department_name
             FROM complaints c
-            JOIN users u ON c.user_id = u.id
-            JOIN departments d ON d.id = c.department_id
+            JOIN users u ON c.user_id = u.user_id
+            JOIN departments d ON d.department_id = c.department_id
             WHERE c.user_id = %s
             ORDER BY c.created_at DESC
             """,
@@ -49,17 +49,23 @@ def user_dashboard():
         )
 
     total = query(
-        "SELECT count(*) FROM complaints WHERE user_id=%s",
+        "SELECT count(*) FROM complaints WHERE user_id = %s",
         (current_user.id,),
         fetchone=True
     )[0]
 
     for c in rows:
         c["created_at"] = (c["created_at"] + timedelta(hours=5, minutes=30))\
-                            .strftime("%H:%M | %d-%m-%Y")
+                            .strftime("%H:%M | %d %B %Y")
+
+        if c["assigned_at"]:
+            c["assigned_at"] = (c["assigned_at"] + timedelta(hours=5, minutes=30))\
+                            .strftime("%d %B %Y")
+        else:
+            c["assigned_at"] = ""
 
     if user["last_login"]:
         user["last_login"] = (user["last_login"] + timedelta(hours=5, minutes=30))\
-                        .strftime("%H:%M  |  %d-%m-%Y")
-    
+                        .strftime("%H:%M  |  %d-%B-%Y")
+
     return render_template("user_dashboard.html", complaints=rows, user=user, status=status, total=total)
