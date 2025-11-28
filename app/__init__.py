@@ -21,7 +21,6 @@ def create_app():
 
 
     @login_manager.user_loader
-    @login_manager.user_loader
     def load_user(user_id):
 
         admin = query(
