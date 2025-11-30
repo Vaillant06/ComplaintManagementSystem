@@ -10,10 +10,14 @@
                 <label>Status</label>
                 <select name="status" class="form-select">
                     {% if complaint.status == "Pending" %}
-                        <option value="Pending">Pending</option>
-                    {% endif %}
-                    <option value="In Progress">In Progress</option>
-                    <option value="Resolved">Resolved</option>
+                        <option value="{{ complaint.status }}">{{ complaint.status }}</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Rejected">Rejected</option>
+                    {% elif complaint.status == "In Progress" %}
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                    {% endif %}                    
                 </select>
             </div>
             <div class="redirection">

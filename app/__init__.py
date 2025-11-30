@@ -41,7 +41,7 @@ def create_app():
         )
         if user:
             return UserWrapper(
-                user["user_id"],
+                user["user_id"],                    
                 user["username"],
                 user["email"],
                 False
