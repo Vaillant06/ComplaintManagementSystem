@@ -139,6 +139,12 @@ def edit_status(complaint_id):
                 ("Resolved the Issue", complaint_id),
                 commit=True
             )
+        elif new_status == "Rejected":
+            query(
+                "UPDATE complaints SET admin_comment = %s WHERE complaint_id = %s",
+                ("Rejected due to duplicate complaint", complaint_id),
+                commit=True
+            )
 
         flash("Status updated successfully!", "success")
         return redirect(url_for("admin.admin_complaints"))
