@@ -114,3 +114,7 @@ table thead th {
 .success {
     color: green;
 }
+
+.info {
+    color: blue;
+}

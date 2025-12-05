@@ -1,7 +1,9 @@
 from flask import Blueprint, flash, redirect, url_for, render_template, abort, request
 from flask_login import login_required , current_user
 from datetime import timedelta
+from app.utils.email import send_notification
 from app.db import query
+
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -137,27 +139,50 @@ def edit_status(complaint_id):
 
     if request.method == "POST":
         new_status = request.form["status"]
-        query(
-            "UPDATE complaints SET status=%s WHERE complaint_id=%s",
-            (new_status, complaint_id),
-            commit=True
-        )
 
-        if new_status == "Resolved":
+        old_status = query(
+            "SELECT status FROM complaints WHERE complaint_id=%s",
+            (complaint_id,),
+            fetchone=True,
+        )["status"]
+
+        if new_status == old_status:
+            flash("Status is unchanged.", "info")
+            return redirect(url_for("admin.admin_complaints"))
+
+        else:
+
             query(
-                "UPDATE complaints SET admin_comment = %s WHERE complaint_id = %s",
-                ("Resolved the Issue", complaint_id),
-                commit=True
-            )
-        elif new_status == "Rejected":
-            query(
-                "UPDATE complaints SET admin_comment = %s WHERE complaint_id = %s",
-                ("Rejected due to duplicate complaint", complaint_id),
-                commit=True
+                "UPDATE complaints SET status=%s WHERE complaint_id=%s",
+                (new_status, complaint_id),
+                commit=True,
             )
 
-        flash("Status updated successfully!", "success")
-        return redirect(url_for("admin.admin_complaints"))
+            user_data = query(
+                """
+                SELECT u.email, u.username, c.title
+                FROM complaints c
+                JOIN users u ON c.user_id = u.user_id
+                WHERE c.complaint_id = %s
+                """,
+                (complaint_id,),
+                fetchone=True,
+            )
+
+            # --- SEND EMAIL NOTIFICATION ---
+            if user_data:
+                send_notification(
+                    to=user_data["email"],
+                    subject="Complaint Status Updated",
+                    body=f"Hello {user_data['username']},\n\n"
+                    f"Your complaint titled '{user_data['title']}' has been updated.\n"
+                    f"Old Status: {old_status}\n"
+                    f"New Status: {new_status}.\n"
+                    f"Regards,\nAdmin Team",
+                )
+
+            flash("Status updated successfully!", "success")
+            return redirect(url_for("admin.admin_complaints"))
 
     comp = query(
         "SELECT * FROM complaints WHERE complaint_id=%s", (complaint_id,), fetchone=True
