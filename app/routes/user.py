@@ -18,7 +18,15 @@ def user_dashboard():
         fetchone=True
     )
 
+    ITEMS_PER_PAGE = 10
+    
     status = request.args.get("status")
+
+    page = request.args.get("page", 1, type=int)
+    offset = (page - 1) * ITEMS_PER_PAGE
+
+    total = query("SELECT COUNT(*) FROM complaints", fetchone=True)[0]
+    total_pages = (total + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
 
     if status:
         rows = query(
@@ -29,8 +37,9 @@ def user_dashboard():
             JOIN departments d ON d.department_id = c.department_id
             WHERE c.status = %s and c.user_id = %s
             ORDER BY c.created_at DESC
+            LIMIT %s OFFSET %s
             """,
-            (status, current_user.id,),
+            (status, current_user.id, ITEMS_PER_PAGE, offset),
             fetchall=True
         )
 
@@ -43,8 +52,9 @@ def user_dashboard():
             JOIN departments d ON d.department_id = c.department_id
             WHERE c.user_id = %s
             ORDER BY c.created_at DESC
+            LIMIT %s OFFSET %s
             """,
-            (current_user.id,),
+            (current_user.id, ITEMS_PER_PAGE, offset),
             fetchall=True
         )
 
@@ -68,4 +78,4 @@ def user_dashboard():
         user["last_login"] = (user["last_login"] + timedelta(hours=5, minutes=30))\
                         .strftime("%H:%M  |  %d-%B-%Y")
 
-    return render_template("user_dashboard.html", complaints=rows, user=user, status=status, total=total)
+    return render_template("user_dashboard.html", complaints=rows, user=user, status=status, total=total, total_pages=total_pages, page=page)
