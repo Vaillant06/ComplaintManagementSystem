@@ -38,8 +38,15 @@ def admin_home():
 def admin_complaints():
     if not current_user.is_admin:      
         abort(403)
-    
+
+    ITEMS_PER_PAGE = 10
     status = request.args.get("status")
+
+    page = request.args.get("page", 1, type=int)
+    offset = (page - 1) * ITEMS_PER_PAGE
+
+    total = query("SELECT COUNT(*) FROM complaints", fetchone=True)[0]
+    total_pages = (total + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
 
     if status:
         rows = query(
@@ -50,9 +57,10 @@ def admin_complaints():
             JOIN departments d ON d.department_id = c.department_id
             WHERE c.status = %s
             ORDER BY c.created_at DESC
+            LIMIT %s OFFSET %s
             """,
-            (status,),
-            fetchall=True
+            (status, ITEMS_PER_PAGE, offset),
+            fetchall=True,
         )
 
     else:
@@ -63,8 +71,10 @@ def admin_complaints():
             JOIN users u ON c.user_id = u.user_id
             JOIN departments d ON d.department_id = c.department_id
             ORDER BY c.created_at DESC
+            LIMIT %s OFFSET %s
             """,
-            fetchall=True
+            (ITEMS_PER_PAGE, offset),
+            fetchall=True,
         )
 
     total = query(
@@ -76,7 +86,7 @@ def admin_complaints():
         c["created_at"] = (c["created_at"] + timedelta(hours=5, minutes=30))\
                             .strftime("%H:%M | %d-%B-%Y")
 
-    return render_template("admin_complaints.html", complaints=rows, status=status, total=total)
+    return render_template("admin_complaints.html", complaints=rows, status=status, total=total, total_pages=total_pages, page=page)
 
 
 # -----------------------------

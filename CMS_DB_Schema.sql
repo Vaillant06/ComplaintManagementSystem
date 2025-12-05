@@ -22,7 +22,7 @@ CREATE TABLE departments (
 -- 3. STAFF TABLE
 
 CREATE TABLE staff (
-    staff_id SERIAL PRIMARY KEY,
+    staff_id VARCHAR(10) PRIMARY KEY,
     staff_name VARCHAR(100) NOT NULL,
     department_id INTEGER NOT NULL,
     email VARCHAR(255),
@@ -57,7 +57,7 @@ CREATE TABLE complaints (
     status VARCHAR(20) NOT NULL DEFAULT 'Pending',
     admin_comment TEXT,               
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    assigned_to INTEGER,  
+    assigned_to VARCHAR(10),  
     assigned_at TIMESTAMP,     
      
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,

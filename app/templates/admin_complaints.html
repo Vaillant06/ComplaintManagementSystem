@@ -217,5 +217,19 @@
             </div>
         </div>
     {% endfor %}
+
+    <div class="d-flex justify-content-center align-items-center mt-4 mb-5 gap-3">
+        {% if page > 1 %}
+        <a href="?page={{ page - 1 }}{% if status %}&status={{status}}{% endif %}" class="btn btn-secondary">Previous</a>
+        {% endif %}
+    
+        <span>Page {{ page }} of {{ total_pages }}</span>
+    
+        {% if page < total_pages %} <a href="?page={{ page + 1 }}{% if status %}&status={{status}}{% endif %}"
+            class="btn btn-secondary">Next</a>
+            {% endif %}
+    </div>
+    
+    
 </div>
 {% endblock %}
