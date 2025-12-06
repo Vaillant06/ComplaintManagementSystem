@@ -21,6 +21,10 @@
                     <i class="bi bi-plus-circle me-1"></i>
                     File new complaint
                 </a>   
+                <a href="https://mailtrap.io/inboxes" class="btn btn-info mt-3">
+                    <i class="bi bi-envelope-paper me-1"></i>
+                    View Emails
+                </a>
                 <a href="/auth/logout" class="btn btn-danger mt-3">
                     <i class="bi bi-box-arrow-right me-1"></i>
                     Logout
@@ -146,14 +150,14 @@
 
             <div class="d-flex justify-content-center align-items-center mt-4 mb-5 gap-3">
                 {% if page > 1 %}
-                <a href="?page={{ page - 1 }}{% if status %}&status={{status}}{% endif %}" class="btn btn-secondary">Previous</a>
+                <a href="?page={{ page - 1 }}{% if status %}&status={{status}}{% endif %}" class="nav-link badge bg-secondary">Previous</a>
                 {% endif %}
             
                 <span>Page {{ page }} of {{ total_pages }}</span>
             
                 {% if page < total_pages %} <a href="?page={{ page + 1 }}{% if status %}&status={{status}}{% endif %}"
-                    class="btn btn-secondary">Next</a>
-                    {% endif %}
+                    class="nav-link badge bg-secondary">Next</a>
+                {% endif %}
             </div>
         </div>
     </div>

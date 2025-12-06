@@ -151,16 +151,9 @@ def edit_status(complaint_id):
             return redirect(url_for("admin.admin_complaints"))
 
         else:
-
-            query(
-                "UPDATE complaints SET status=%s WHERE complaint_id=%s",
-                (new_status, complaint_id),
-                commit=True,
-            )
-
-            user_data = query(
+            complaint_data = query(
                 """
-                SELECT u.email, u.username, c.title
+                SELECT u.email, u.username, c.title, c.department_id
                 FROM complaints c
                 JOIN users u ON c.user_id = u.user_id
                 WHERE c.complaint_id = %s
@@ -169,16 +162,33 @@ def edit_status(complaint_id):
                 fetchone=True,
             )
 
-            # --- SEND EMAIL NOTIFICATION ---
-            if user_data:
+            department_id = complaint_data["department_id"]
+
+            staff_id = query(
+                """
+                SELECT staff_id
+                FROM staff  
+                WHERE department_id = %s
+                """,
+                (department_id,),
+                fetchone=True,
+            )[0]
+
+            if complaint_data:
                 send_notification(
-                    to=user_data["email"],
+                    to=complaint_data["email"],
                     subject="Complaint Status Updated",
-                    body=f"Hello {user_data['username']},\n\n"
-                    f"Your complaint titled '{user_data['title']}' has been updated.\n"
+                    body=f"Hello {complaint_data['username']},\n\n"
+                    f"Your complaint titled '{complaint_data['title']}' has been updated.\n"
                     f"Old Status: {old_status}\n"
                     f"New Status: {new_status}.\n"
                     f"Regards,\nAdmin Team",
+                )
+
+                query(
+                    "UPDATE complaints SET status=%s, assigned_to=%s, assigned_at=NOW() WHERE complaint_id=%s",
+                    (new_status, staff_id, complaint_id),
+                    commit=True,
                 )
 
             flash("Status updated successfully!", "success")

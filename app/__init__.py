@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 from flask_mail import Mail
 import os
 
-mail = Mail()
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "static", "uploads")
 
 load_dotenv()
-
+mail = Mail()
 login_manager = LoginManager()
 bcrypt = Bcrypt()
 
@@ -16,22 +16,24 @@ bcrypt = Bcrypt()
 def create_app():
     app = Flask(__name__)
     app.config.from_object("config.Config")
-    # Looking to send emails in production? Check out our Email API/SMTP product!
+
     app.config['MAIL_SERVER']='sandbox.smtp.mailtrap.io'
     app.config['MAIL_PORT'] = 2525
-    app.config['MAIL_USERNAME'] = '0ca6c1490e4663'
-    app.config['MAIL_PASSWORD'] = '726f3cb3f3b7c4'
+    app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
+    app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
     app.config['MAIL_USE_TLS'] = True
     app.config['MAIL_USE_SSL'] = False
 
     mail.init_app(app)
+
+    app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
 
     from app.db import query
     from app.user_wrapper import UserWrapper
-
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -47,7 +49,7 @@ def create_app():
                 admin["email"],
                 True
             )
-        
+
         user = query(
             "SELECT user_id, username, email FROM users WHERE user_id=%s",
             (user_id,), fetchone=True
@@ -61,7 +63,6 @@ def create_app():
             )
 
         return None
-
 
     from app.routes import auth, complaints, admin, home, user, contact
 

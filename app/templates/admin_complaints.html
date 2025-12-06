@@ -176,6 +176,12 @@
 
                         <p><strong>Created AT : </strong> {{ c.created_at }}</p>
 
+                        {% if c.attachment %}
+                        <a href="{{ url_for('static', filename='uploads/' ~ c.attachment) }}" target="_blank" class="btn btn-sm btn-outline-info mb-3">
+                            View attachment
+                        </a>
+                        {% endif %}
+
                         <!-- ADMIN COMMENT -->
                         <form method="POST" action="{{ url_for('admin.add_comment', complaint_id=c.complaint_id) }}">
                             {% if c.status == "Resolved" or c.status == "Rejected" %}
