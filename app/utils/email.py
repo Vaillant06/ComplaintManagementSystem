@@ -1,5 +1,5 @@
 from flask_mail import Message
-from app import mail
+from app.extensions import mail
 
 
 def send_notification(to, subject, body):
