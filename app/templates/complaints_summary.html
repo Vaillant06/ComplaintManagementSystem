@@ -7,6 +7,7 @@
 
     <!-- IF COMPLAINTS EXIST -->
     {% if pending or progress or resolved or rejected %}
+        <h3 class="text-center text-bg-secondary p-3">STATUS WISE SUMMARY</h3>
         <table class="table bg-light table-bordered mb-0">
             <thead>
                 <tr>
@@ -27,6 +28,29 @@
                 </tr>    
             </tbody>
         </table>
+
+        {% if electrical or water or public_works or health_care %}
+            <h3 class="text-center text-bg-secondary p-3 mt-5">DEPARTMENT WISE SUMMARY</h3>
+            <table class="table bg-light table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th><span class="btn btn-sm btn-outline-secondary fw-bold">ELECTRICAL</span></th>
+                        <th><span class="btn btn-sm btn-outline-secondary fw-bold">WATER</span></th>
+                        <th><span class="btn btn-sm btn-outline-secondary fw-bold">PUBLIC WORKS</span></th>
+                        <th><span class="btn btn-sm btn-outline-secondary fw-bold">HEALTH CARE</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold fs-2 m-5 p-5">{{ electrical }}</td>
+                        <td class="fw-bold fs-2 m-5 p-5">{{ water}}</td>
+                        <td class="fw-bold fs-2 m-5 p-5">{{ public_works }}</td>
+                        <td class="fw-bold fs-2 m-5 p-5">{{ health_care }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
+
         <a href="{{ url_for ('admin.admin_complaints') }}" class="btn btn-info my-3">
             <i class="bi bi-eye me-1"></i>
             View Complaints

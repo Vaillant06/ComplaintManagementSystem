@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="analytics m-5">
+    <h3 class="fw-bold text-center fs-2 py-4">COMPLAINTS ANALYTICS</h3>
+
+    <div class="row text-center g-4 my-4">
+    
+        <div class="col-md-3">
+            <div class="card analytics-card text-bg-outline-secondary" onclick="showChart('dept')">
+                <i class="bi bi-bar-chart fs-1 mb-2"></i>
+                <h5>Department Workload</h5>
+            </div>
+        </div>
+    
+        <div class="col-md-3">
+            <div class="card analytics-card text-bg-outline-secondary" onclick="showChart('trend')">
+                <i class="bi bi-graph-up fs-1 mb-2"></i>
+                <h5>Daily Trends</h5>
+            </div>
+        </div>
+    
+        <div class="col-md-3">
+            <div class="card analytics-card text-bg-outline-secondary" onclick="showChart('status')">
+                <i class="bi bi-pie-chart fs-1 mb-2"></i>
+                <h5>Status Breakdown</h5>
+            </div>
+        </div>
+    
+        <div class="col-md-3">
+            <div class="card analytics-card text-bg-outline-secondary" onclick="newFeature()">
+                <i class="bi bi-clock-history fs-1 mb-2"></i>
+                <h5>Resolution Time</h5>
+            </div>
+        </div>
+    
+    </div>
+
+    <div class="my-5">
+        <div id="chart-dept" class="chart-box" style="display:none;">
+            <canvas id="deptChart"></canvas>
+        </div>
+        
+        <div id="chart-trend" class="chart-box" style="display:none;">
+            <canvas id="trendChart"></canvas>
+        </div>
+        
+        <div id="chart-status" class="chart-box" style="display:none;">
+            <canvas id="statusChart"></canvas>
+        </div>
+        
+        <div id="chart-sla" class="chart-box" style="display:none;">
+            <canvas id="slaChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        function showChart(name) {
+            document.querySelectorAll('.chart-box').forEach(div => div.style.display = "none");
+            document.getElementById('chart-' + name).style.display = "block";
+        }
+
+        showChart('dept');
+
+        function newFeature() {
+            alert("Resolution Time analytics coming soon!");
+        }
+    </script>
+        
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="{{ url_for('static', filename='js/dept_chart.js') }}" id="deptData" data-labels='{{ labels|tojson }}'
+        data-counts='{{ counts|tojson }}'>
+        </script>
+    
+    <script src="{{ url_for('static', filename='js/trend_chart.js') }}" id="trendData"
+        data-labels='{{ trend_labels|tojson }}' data-counts='{{ trend_counts|tojson }}'>
+        </script>
+    
+    <script src="{{ url_for('static', filename='js/status_chart.js') }}" id="statusData"
+        data-labels='{{ status_labels|tojson }}' data-counts='{{ status_counts|tojson }}'>
+        </script>
+                
+    <a href="{{ url_for('admin.admin_home') }}" class="btn btn-secondary mb-3">
+        <i class="bi bi-arrow-left me-1"></i>
+        Back
+    </a>
+</div>
+{% endblock %}

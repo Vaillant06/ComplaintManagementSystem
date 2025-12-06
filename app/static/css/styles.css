@@ -10,12 +10,19 @@
     font-weight: 700;
 }
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 header {
     background-color: rgb(65, 217, 255);
 }
 
 body {
     font-family: 'Poppins', sans-serif;
+    min-height: 110vh;
 }
 
 .container {
@@ -106,6 +113,26 @@ table thead th {
     padding: 16px 14px;
 }
 
+.analytics-card {
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 15px;
+    background: #f8f9fa;
+    transition: all 0.2s ease;
+    border: 1px solid #dee2e6;
+}
+
+.analytics-card:hover {
+    background: #e9ecef;
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+
+#chart-status {
+    width: 500px;
+    margin: auto;
+}
 
 .alert {
     color: red;

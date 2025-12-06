@@ -120,12 +120,105 @@ def complaints_summary():
         fetchone=True
     )[0]
 
+    electrical = query(
+        "SELECT count(*) FROM complaints WHERE department_id=1",
+        fetchone=True
+    )[0]
+
+    water =  query(
+        "SELECT count(*) FROM complaints WHERE department_id=2",
+        fetchone=True
+    )[0]
+
+    public_works = query(
+        "SELECT count(*) FROM complaints WHERE department_id=3",
+        fetchone=True
+    )[0]
+
+    health_care = query(
+        "SELECT count(*) FROM complaints WHERE department_id=4",
+        fetchone=True
+    )[0]
+
     total = query(
         "SELECT count(*) FROM complaints",
         fetchone=True
     )[0]
 
-    return render_template("complaints_summary.html", pending=pending, progress=progress, resolved=resolved, rejected=rejected, total=total)
+    return render_template(
+        "complaints_summary.html", 
+        pending=pending, 
+        progress=progress, 
+        resolved=resolved, 
+        rejected=rejected, 
+        electrical=electrical, 
+        water=water, 
+        public_works=public_works,      
+        health_care=health_care,
+        total=total
+    )
+
+# -----------------------------
+#      COMPLAINT ANALYTICS
+# -----------------------------
+@bp.route("/complaints_analytics")
+@login_required
+def complaints_analytics():
+    if not current_user.is_admin:
+        abort(403)
+
+    rows = query(
+        """
+        SELECT d.department_name, COUNT(*) AS total
+        FROM complaints c
+        JOIN departments d ON c.department_id = d.department_id
+        GROUP BY d.department_name
+        ORDER BY d.department_name
+        """,
+        fetchall=True,
+    )
+
+    labels = [row["department_name"] for row in rows]
+    counts = [row["total"] for row in rows]
+
+    daily_rows = query(
+        """
+    SELECT 
+        TO_CHAR(created_at, 'DD Mon') AS day,
+        DATE(created_at) AS day_order,
+        COUNT(*) AS total
+    FROM complaints
+    GROUP BY day, day_order
+    ORDER BY day_order;
+    """,
+        fetchall=True,
+    )
+
+    trend_labels = [row["day"] for row in daily_rows]
+    trend_counts = [row["total"] for row in daily_rows]
+
+    status_rows = query(
+        """
+    SELECT status, COUNT(*) AS total
+    FROM complaints
+    GROUP BY status
+    ORDER BY status;
+    """,
+        fetchall=True,
+    )
+
+    status_labels = [row["status"] for row in status_rows]
+    status_counts = [row["total"] for row in status_rows]
+
+    return render_template(
+        "complaints_analytics.html",
+        labels=labels,
+        counts=counts,
+        trend_labels=trend_labels,
+        trend_counts=trend_counts,
+        status_labels=status_labels,
+        status_counts=status_counts,
+    )
 
 
 # -----------------------------
@@ -182,6 +275,7 @@ def edit_status(complaint_id):
                     f"Your complaint titled '{complaint_data['title']}' has been updated.\n"
                     f"Old Status: {old_status}\n"
                     f"New Status: {new_status}.\n"
+                    f"View your complaint for more details.\n"
                     f"Regards,\nAdmin Team",
                 )
 
@@ -206,7 +300,7 @@ def edit_status(complaint_id):
                 query(
                     """
                     UPDATE complaints
-                    SET assigned_to=NULL, assigned_at=NULL, admin_comment='Resolved the issue'
+                    SET assigned_to=NULL, assigned_at=NULL, resolved_at=NOW(), admin_comment='Resolved the issue'
                     WHERE complaint_id=%s 
                     """,
                     (complaint_id,),
