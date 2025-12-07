@@ -48,15 +48,30 @@ def admin_complaints():
     offset = (page - 1) * ITEMS_PER_PAGE
 
     if status:
-        total = query(
-            "SELECT COUNT(*) FROM complaints WHERE status = %s",
+        total_count = query(
+            """
+            SELECT COUNT(*)
+            FROM complaints c
+            JOIN departments d ON c.department_id = d.department_id
+            JOIN users u ON c.user_id = u.user_id
+            WHERE c.status = %s
+            """,
             (status,),
             fetchone=True
         )[0]
     else:
-        total = query("SELECT COUNT(*) FROM complaints", fetchone=True)[0]
+        total_count = query(
+            """
+            SELECT COUNT(*)
+            FROM complaints c
+            JOIN departments d ON c.department_id = d.department_id
+            JOIN users u ON c.user_id = u.user_id
+            """,
+            fetchone=True
+        )[0]
 
-    total_pages = (total + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
+
+    total_pages = (total_count + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
 
     if status:
         rows = query(

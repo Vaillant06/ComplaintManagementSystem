@@ -14,8 +14,8 @@ if (statusEl) {
                 backgroundColor: [
                     "#0d6efd",
                     "#ffc107",
-                    "#198754",
-                    "#dc3545"
+                    "#dc3545",
+                    "#198754"
                 ]
             }]
         },

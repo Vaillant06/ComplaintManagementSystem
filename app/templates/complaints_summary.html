@@ -1,33 +1,33 @@
-<!-- COMPLAINTS SUMMARY -->
-
 {% extends 'base.html' %}
 {% block content %}
+
 <div class="summary m-5">
 
     <h3 class="fw-bold text-center fs-2 m-3 p-3">COMPLAINTS SUMMARY</h3>
 
     {% if pending or progress or resolved or rejected %}
 
-    <!-- SUMMARY SELECTION CARDS -->
+    <!-- SUMMARY TOGGLE CARDS -->
     <div class="row text-center g-4 my-4">
 
         <div class="col-md-6">
-            <div class="card analytics-card text-bg-outline-secondary p-4" onclick="showSummary('status-summary')">
-                <i class="bi bi-card-checklist fs-1 text-center"></i>
+            <div id="statusCard" class="card analytics-card p-4" onclick="showSummary('status')">
+                <i class="bi bi-card-checklist fs-1"></i>
                 <h5 class="mt-3">STATUS WISE SUMMARY</h5>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="card analytics-card text-bg-outline-secondary p-4" onclick="showSummary('department-summary')">
-                <i class="bi bi-building fs-1 text-center"></i>
+            <div id="deptCard" class="card analytics-card p-4" onclick="showSummary('dept')">
+                <i class="bi bi-building fs-1"></i>
                 <h5 class="mt-3">DEPARTMENT WISE SUMMARY</h5>
             </div>
         </div>
 
     </div>
 
-    <div id="status-summary" class="summary-box">
+    <!-- STATUS SUMMARY SECTION -->
+    <div id="section-status" class="summary-section">
 
         <h3 class="text-center text-bg-secondary p-3">STATUS WISE SUMMARY</h3>
 
@@ -54,33 +54,22 @@
 
     </div>
 
-    <div id="department-summary" class="summary-box" style="display: none;">
+    <!-- DEPARTMENT SUMMARY SECTION -->
+    <div id="section-dept" class="summary-section" style="display:none;">
 
         <h3 class="text-center text-bg-secondary p-3 mt-5">DEPARTMENT WISE SUMMARY</h3>
 
         <table class="table bg-light table-bordered mb-0">
             <thead>
                 <tr>
-                    <th>
-                        <span class="btn btn-sm btn-outline-secondary fw-bold">
-                            <i class="bi bi-lightbulb-fill me-1"></i>ELECTRICAL
-                        </span>
-                    </th>
-                    <th>
-                        <span class="btn btn-sm btn-outline-secondary fw-bold">
-                            <i class="bi bi-droplet-fill me-1"></i>WATER
-                        </span>
-                    </th>
-                    <th>
-                        <span class="btn btn-sm btn-outline-secondary fw-bold">
-                            <i class="bi bi-cone-striped me-1"></i>PUBLIC WORKS
-                        </span>
-                    </th>
-                    <th>
-                        <span class="btn btn-sm btn-outline-secondary fw-bold">
-                            <i class="bi bi-hospital-fill me-1"></i>HEALTH CARE
-                        </span>
-                    </th>
+                    <th><span class="btn btn-sm btn-outline-secondary fw-bold"><i
+                                class="bi bi-lightbulb-fill me-1"></i>ELECTRICAL</span></th>
+                    <th><span class="btn btn-sm btn-outline-secondary fw-bold"><i
+                                class="bi bi-droplet-fill me-1"></i>WATER</span></th>
+                    <th><span class="btn btn-sm btn-outline-secondary fw-bold"><i
+                                class="bi bi-cone-striped me-1"></i>PUBLIC WORKS</span></th>
+                    <th><span class="btn btn-sm btn-outline-secondary fw-bold"><i
+                                class="bi bi-hospital-fill me-1"></i>HEALTH CARE</span></th>
                 </tr>
             </thead>
 
@@ -90,48 +79,44 @@
                     <!-- ELECTRICAL -->
                     <td class="fw-bold fs-2 py-4">
                         {{ electrical }}
-
                         <div class="mt-5 fs-6">
-                            Pending: <span class="badge bg-warning mx-2 my-2">{{ electrical_pending }}</span><br>
-                            Progress: <span class="badge bg-info mx-2 my-2">{{ electrical_progress }}</span><br>
-                            Resolved: <span class="badge bg-success mx-2 my-2">{{ electrical_resolved }}</span><br>
-                            Rejected: <span class="badge bg-danger mx-2 my-2">{{ electrical_rejected }}</span>
+                            Pending: <span class="badge bg-warning mx-2">{{ electrical_pending }}</span><br>
+                            Progress: <span class="badge bg-info mx-2">{{ electrical_progress }}</span><br>
+                            Resolved: <span class="badge bg-success mx-2">{{ electrical_resolved }}</span><br>
+                            Rejected: <span class="badge bg-danger mx-2">{{ electrical_rejected }}</span>
                         </div>
                     </td>
 
                     <!-- WATER -->
                     <td class="fw-bold fs-2 py-4">
                         {{ water }}
-
                         <div class="mt-5 fs-6">
-                            Pending: <span class="badge bg-warning mx-2 my-2">{{ water_pending }}</span><br>
-                            Progress: <span class="badge bg-info mx-2 my-2">{{ water_progress }}</span><br>
-                            Resolved: <span class="badge bg-success mx-2 my-2">{{ water_resolved }}</span><br>
-                            Rejected: <span class="badge bg-danger mx-2 my-2">{{ water_rejected }}</span>
+                            Pending: <span class="badge bg-warning mx-2">{{ water_pending }}</span><br>
+                            Progress: <span class="badge bg-info mx-2">{{ water_progress }}</span><br>
+                            Resolved: <span class="badge bg-success mx-2">{{ water_resolved }}</span><br>
+                            Rejected: <span class="badge bg-danger mx-2">{{ water_rejected }}</span>
                         </div>
                     </td>
 
                     <!-- PUBLIC WORKS -->
                     <td class="fw-bold fs-2 py-4">
                         {{ public_works }}
-
                         <div class="mt-5 fs-6">
-                            Pending: <span class="badge bg-warning mx-2 my-2">{{ pw_pending }}</span><br>
-                            Progress: <span class="badge bg-info mx-2 my-2">{{ pw_progress }}</span><br>
-                            Resolved: <span class="badge bg-success mx-2 my-2">{{ pw_resolved }}</span><br>
-                            Rejected: <span class="badge bg-danger mx-2 my-2">{{ pw_rejected }}</span>
+                            Pending: <span class="badge bg-warning mx-2">{{ pw_pending }}</span><br>
+                            Progress: <span class="badge bg-info mx-2">{{ pw_progress }}</span><br>
+                            Resolved: <span class="badge bg-success mx-2">{{ pw_resolved }}</span><br>
+                            Rejected: <span class="badge bg-danger mx-2">{{ pw_rejected }}</span>
                         </div>
                     </td>
 
                     <!-- HEALTH CARE -->
                     <td class="fw-bold fs-2 py-4">
                         {{ health_care }}
-
                         <div class="mt-5 fs-6">
-                            Pending: <span class="badge bg-warning mx-2 my-2">{{ hc_pending }}</span><br>
-                            Progress: <span class="badge bg-info mx-2 my-2">{{ hc_progress }}</span><br>
-                            Resolved: <span class="badge bg-success mx-2 my-2">{{ hc_resolved }}</span><br>
-                            Rejected: <span class="badge bg-danger mx-2 my-2">{{ hc_rejected }}</span>
+                            Pending: <span class="badge bg-warning mx-2">{{ hc_pending }}</span><br>
+                            Progress: <span class="badge bg-info mx-2">{{ hc_progress }}</span><br>
+                            Resolved: <span class="badge bg-success mx-2">{{ hc_resolved }}</span><br>
+                            Rejected: <span class="badge bg-danger mx-2">{{ hc_rejected }}</span>
                         </div>
                     </td>
 
@@ -141,7 +126,7 @@
 
     </div>
 
-    <!-- ACTION BUTTONS -->
+    <!-- BUTTONS -->
     <a href="{{ url_for('admin.admin_complaints') }}" class="btn btn-info my-3">
         <i class="bi bi-eye me-1"></i> View Complaints
     </a>
@@ -159,28 +144,31 @@
     </a>
 
     {% endif %}
-
-</div>
-
-<!-- FLASH MESSAGES -->
-<div class="flash-messages text-center mt-3">
-    {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <p class="{{ category }}">{{ message }}</p>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
 </div>
 
 <!-- TOGGLE SCRIPT -->
 <script>
     function showSummary(name) {
-        document.querySelectorAll('.summary-box').forEach(div => {
-            div.style.display = "none";
-        });
-        document.getElementById(name).style.display = "block";
+
+        // hide both sections
+        document.querySelectorAll(".summary-section").forEach(s => s.style.display = "none");
+
+        // show selected
+        document.getElementById("section-" + name).style.display = "block";
+
+        // remove active highlight
+        document.querySelectorAll(".analytics-card").forEach(c => c.classList.remove("active"));
+
+        // add active highlight
+        if (name === "status") {
+            document.getElementById("statusCard").classList.add("active");
+        } else {
+            document.getElementById("deptCard").classList.add("active");
+        }
     }
-    showSummary('status-summary');
+
+    // default
+    showSummary("status");
 </script>
+
 {% endblock %}
