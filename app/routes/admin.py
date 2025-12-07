@@ -47,7 +47,15 @@ def admin_complaints():
     page = request.args.get("page", 1, type=int)
     offset = (page - 1) * ITEMS_PER_PAGE
 
-    total = query("SELECT COUNT(*) FROM complaints", fetchone=True)[0]
+    if status:
+        total = query(
+            "SELECT COUNT(*) FROM complaints WHERE status = %s",
+            (status,),
+            fetchone=True
+        )[0]
+    else:
+        total = query("SELECT COUNT(*) FROM complaints", fetchone=True)[0]
+
     total_pages = (total + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
 
     if status:
@@ -145,6 +153,86 @@ def complaints_summary():
         fetchone=True
     )[0]
 
+    electrical_pending = query(
+        "SELECT count(*) FROM complaints WHERE department_id=1 AND status='Pending'",
+        fetchone=True
+    )[0]
+
+    electrical_progress = query(
+        "SELECT count(*) FROM complaints WHERE department_id=1 AND status='In Progress'",
+        fetchone=True
+    )[0]
+
+    electrical_resolved = query(            
+        "SELECT count(*) FROM complaints WHERE department_id=1 AND status='Resolved'",
+        fetchone=True
+    )[0]    
+
+    electrical_rejected = query(        
+        "SELECT count(*) FROM complaints WHERE department_id=1 AND status='Rejected'",
+        fetchone=True
+    )[0]   
+
+    water_pending = query(
+        "SELECT count(*) FROM complaints WHERE department_id=2 AND status='Pending'",
+        fetchone=True,
+    )[0]
+
+    water_progress = query(
+        "SELECT count(*) FROM complaints WHERE department_id=2 AND status='In Progress'",
+        fetchone=True,
+    )[0]
+
+    water_resolved = query(
+        "SELECT count(*) FROM complaints WHERE department_id=2 AND status='Resolved'",
+        fetchone=True,
+    )[0]
+
+    water_rejected = query(
+        "SELECT count(*) FROM complaints WHERE department_id=2 AND status='Rejected'",
+        fetchone=True,
+    )[0]
+
+    pw_pending = query(
+        "SELECT count(*) FROM complaints WHERE department_id=3 AND status='Pending'",
+        fetchone=True,
+    )[0]
+
+    pw_progress = query(
+        "SELECT count(*) FROM complaints WHERE department_id=3 AND status='In Progress'",
+        fetchone=True,
+    )[0]
+
+    pw_resolved = query(
+        "SELECT count(*) FROM complaints WHERE department_id=3 AND status='Resolved'",
+        fetchone=True,
+    )[0]
+
+    pw_rejected = query(
+        "SELECT count(*) FROM complaints WHERE department_id=3 AND status='Rejected'",
+        fetchone=True,
+    )[0]
+
+    hc_pending = query(
+        "SELECT count(*) FROM complaints WHERE department_id=4 AND status='Pending'",
+        fetchone=True,
+    )[0]
+
+    hc_progress = query(
+        "SELECT count(*) FROM complaints WHERE department_id=4 AND status='In Progress'",
+        fetchone=True,
+    )[0]
+
+    hc_resolved = query(
+        "SELECT count(*) FROM complaints WHERE department_id=4 AND status='Resolved'",
+        fetchone=True,
+    )[0]
+
+    hc_rejected = query(
+        "SELECT count(*) FROM complaints WHERE department_id=4 AND status='Rejected'",
+        fetchone=True,
+    )[0]
+
     return render_template(
         "complaints_summary.html", 
         pending=pending, 
@@ -155,6 +243,22 @@ def complaints_summary():
         water=water, 
         public_works=public_works,      
         health_care=health_care,
+        electrical_pending=electrical_pending,
+        electrical_progress=electrical_progress,
+        electrical_resolved=electrical_resolved,    
+        electrical_rejected=electrical_rejected,
+        water_pending=water_pending,
+        water_progress=water_progress,
+        water_resolved=water_resolved,
+        water_rejected=water_rejected,
+        pw_pending=pw_pending,
+        pw_progress=pw_progress,
+        pw_resolved=pw_resolved,
+        pw_rejected=pw_rejected,
+        hc_pending=hc_pending,
+        hc_progress=hc_progress,
+        hc_resolved=hc_resolved,
+        hc_rejected=hc_rejected,
         total=total
     )
 

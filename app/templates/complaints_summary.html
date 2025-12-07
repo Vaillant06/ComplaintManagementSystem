@@ -3,11 +3,34 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="summary m-5">
+
     <h3 class="fw-bold text-center fs-2 m-3 p-3">COMPLAINTS SUMMARY</h3>
 
-    <!-- IF COMPLAINTS EXIST -->
     {% if pending or progress or resolved or rejected %}
+
+    <!-- SUMMARY SELECTION CARDS -->
+    <div class="row text-center g-4 my-4">
+
+        <div class="col-md-6">
+            <div class="card analytics-card text-bg-outline-secondary p-4" onclick="showSummary('status-summary')">
+                <i class="bi bi-card-checklist fs-1 text-center"></i>
+                <h5 class="mt-3">STATUS WISE SUMMARY</h5>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card analytics-card text-bg-outline-secondary p-4" onclick="showSummary('department-summary')">
+                <i class="bi bi-building fs-1 text-center"></i>
+                <h5 class="mt-3">DEPARTMENT WISE SUMMARY</h5>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="status-summary" class="summary-box">
+
         <h3 class="text-center text-bg-secondary p-3">STATUS WISE SUMMARY</h3>
+
         <table class="table bg-light table-bordered mb-0">
             <thead>
                 <tr>
@@ -20,85 +43,144 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="fw-bold fs-2 m-5 p-5">{{ pending }}</td>
-                    <td class="fw-bold fs-2 m-5 p-5">{{ progress }}</td>
-                    <td class="fw-bold fs-2 m-5 p-5">{{ resolved }}</td>
-                    <td class="fw-bold fs-2 m-5 p-5">{{ rejected }}</td>
-                    <td class="fw-bold fs-2 m-5 p-5">{{ total }}</td>
-                </tr>    
+                    <td class="fw-bold fs-2 py-4">{{ pending }}</td>
+                    <td class="fw-bold fs-2 py-4">{{ progress }}</td>
+                    <td class="fw-bold fs-2 py-4">{{ resolved }}</td>
+                    <td class="fw-bold fs-2 py-4">{{ rejected }}</td>
+                    <td class="fw-bold fs-2 py-4">{{ total }}</td>
+                </tr>
             </tbody>
         </table>
 
-        {% if electrical or water or public_works or health_care %}
-            <h3 class="text-center text-bg-secondary p-3 mt-5">DEPARTMENT WISE SUMMARY</h3>
-            <table class="table bg-light table-bordered mb-0">
-                <thead>
-                    <tr>
-                        <th>
-                            <span class="btn btn-sm btn-outline-secondary fw-bold">
-                                <i class="bi bi-lightbulb-fill me-1"></i>
-                                ELECTRICAL
-                            </span>
-                        </th>
-                        <th>
-                            <span class="btn btn-sm btn-outline-secondary fw-bold">
-                                <i class="bi bi-droplet-fill me-1"></i>
-                                WATER
-                            </span>
-                        </th>
-                        <th>
-                            <span class="btn btn-sm btn-outline-secondary fw-bold">
-                                <i class="bi bi-cone-striped me-1"></i>
-                                PUBLIC WORKS
-                            </span>
-                        </th>
-                        <th>
-                            <span class="btn btn-sm btn-outline-secondary fw-bold">
-                                <i class="bi bi-hospital-fill me-1"></i>
-                                HEALTH CARE
-                            </span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="fw-bold fs-2 m-5 p-5">{{ electrical }}</td>
-                        <td class="fw-bold fs-2 m-5 p-5">{{ water}}</td>
-                        <td class="fw-bold fs-2 m-5 p-5">{{ public_works }}</td>
-                        <td class="fw-bold fs-2 m-5 p-5">{{ health_care }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        {% endif %}
+    </div>
 
-        <a href="{{ url_for ('admin.admin_complaints') }}" class="btn btn-info my-3">
-            <i class="bi bi-eye me-1"></i>
-            View Complaints
-        </a>
-        <a href="{{ url_for('admin.admin_home') }}" class="btn btn-secondary mb-3">
-            <i class="bi bi-arrow-left me-1"></i>
-            Back</a>
+    <div id="department-summary" class="summary-box" style="display: none;">
 
-    <!-- IF NO COMPLAINTS EXIST -->
+        <h3 class="text-center text-bg-secondary p-3 mt-5">DEPARTMENT WISE SUMMARY</h3>
+
+        <table class="table bg-light table-bordered mb-0">
+            <thead>
+                <tr>
+                    <th>
+                        <span class="btn btn-sm btn-outline-secondary fw-bold">
+                            <i class="bi bi-lightbulb-fill me-1"></i>ELECTRICAL
+                        </span>
+                    </th>
+                    <th>
+                        <span class="btn btn-sm btn-outline-secondary fw-bold">
+                            <i class="bi bi-droplet-fill me-1"></i>WATER
+                        </span>
+                    </th>
+                    <th>
+                        <span class="btn btn-sm btn-outline-secondary fw-bold">
+                            <i class="bi bi-cone-striped me-1"></i>PUBLIC WORKS
+                        </span>
+                    </th>
+                    <th>
+                        <span class="btn btn-sm btn-outline-secondary fw-bold">
+                            <i class="bi bi-hospital-fill me-1"></i>HEALTH CARE
+                        </span>
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+
+                    <!-- ELECTRICAL -->
+                    <td class="fw-bold fs-2 py-4">
+                        {{ electrical }}
+
+                        <div class="mt-5 fs-6">
+                            Pending: <span class="badge bg-warning mx-2 my-2">{{ electrical_pending }}</span><br>
+                            Progress: <span class="badge bg-info mx-2 my-2">{{ electrical_progress }}</span><br>
+                            Resolved: <span class="badge bg-success mx-2 my-2">{{ electrical_resolved }}</span><br>
+                            Rejected: <span class="badge bg-danger mx-2 my-2">{{ electrical_rejected }}</span>
+                        </div>
+                    </td>
+
+                    <!-- WATER -->
+                    <td class="fw-bold fs-2 py-4">
+                        {{ water }}
+
+                        <div class="mt-5 fs-6">
+                            Pending: <span class="badge bg-warning mx-2 my-2">{{ water_pending }}</span><br>
+                            Progress: <span class="badge bg-info mx-2 my-2">{{ water_progress }}</span><br>
+                            Resolved: <span class="badge bg-success mx-2 my-2">{{ water_resolved }}</span><br>
+                            Rejected: <span class="badge bg-danger mx-2 my-2">{{ water_rejected }}</span>
+                        </div>
+                    </td>
+
+                    <!-- PUBLIC WORKS -->
+                    <td class="fw-bold fs-2 py-4">
+                        {{ public_works }}
+
+                        <div class="mt-5 fs-6">
+                            Pending: <span class="badge bg-warning mx-2 my-2">{{ pw_pending }}</span><br>
+                            Progress: <span class="badge bg-info mx-2 my-2">{{ pw_progress }}</span><br>
+                            Resolved: <span class="badge bg-success mx-2 my-2">{{ pw_resolved }}</span><br>
+                            Rejected: <span class="badge bg-danger mx-2 my-2">{{ pw_rejected }}</span>
+                        </div>
+                    </td>
+
+                    <!-- HEALTH CARE -->
+                    <td class="fw-bold fs-2 py-4">
+                        {{ health_care }}
+
+                        <div class="mt-5 fs-6">
+                            Pending: <span class="badge bg-warning mx-2 my-2">{{ hc_pending }}</span><br>
+                            Progress: <span class="badge bg-info mx-2 my-2">{{ hc_progress }}</span><br>
+                            Resolved: <span class="badge bg-success mx-2 my-2">{{ hc_resolved }}</span><br>
+                            Rejected: <span class="badge bg-danger mx-2 my-2">{{ hc_rejected }}</span>
+                        </div>
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <a href="{{ url_for('admin.admin_complaints') }}" class="btn btn-info my-3">
+        <i class="bi bi-eye me-1"></i> View Complaints
+    </a>
+
+    <a href="{{ url_for('admin.admin_home') }}" class="btn btn-secondary mb-3">
+        <i class="bi bi-arrow-left me-1"></i> Back
+    </a>
+
     {% else %}
-        <p class="text-center">No filed complaints</p>
-        <div class="redirection">
-            <a href="{{ url_for('admin.admin_home') }}" class="btn btn-secondary mb-3">
-                <i class="bi bi-arrow-left me-1"></i>
-                Back    
-            </a>
-        </div>
+
+    <p class="text-center">No filed complaints</p>
+
+    <a href="{{ url_for('admin.admin_home') }}" class="btn btn-secondary mb-3">
+        <i class="bi bi-arrow-left me-1"></i> Back
+    </a>
+
     {% endif %}
 
-    <!-- FLASH MESSAGES -->
-    <div class="flash-messages text-center mt-3">
-        {% with messages = get_flashed_messages(with_categories=True) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <p class="{{ category }}">{{ message }}</p>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
 </div>
+
+<!-- FLASH MESSAGES -->
+<div class="flash-messages text-center mt-3">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="{{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<!-- TOGGLE SCRIPT -->
+<script>
+    function showSummary(name) {
+        document.querySelectorAll('.summary-box').forEach(div => {
+            div.style.display = "none";
+        });
+        document.getElementById(name).style.display = "block";
+    }
+    showSummary('status-summary');
+</script>
 {% endblock %}

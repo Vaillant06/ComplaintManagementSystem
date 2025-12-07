@@ -25,7 +25,15 @@ def user_dashboard():
     page = request.args.get("page", 1, type=int)
     offset = (page - 1) * ITEMS_PER_PAGE
 
-    total = query("SELECT COUNT(*) FROM complaints", fetchone=True)[0]
+    if status:
+        total = query(
+            "SELECT COUNT(*) FROM complaints WHERE status = %s",
+            (status,),
+            fetchone=True
+        )[0]
+    else:
+        total = query("SELECT COUNT(*) FROM complaints", fetchone=True)[0]
+        
     total_pages = (total + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
 
     if status:
