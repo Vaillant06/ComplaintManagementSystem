@@ -165,6 +165,14 @@ table thead th {
     margin: auto;
 }
 
+.toggle {
+    position: absolute;
+    top: 50%;
+    right: 5%;
+    font-size: 1.3rem;
+    cursor: pointer;
+}
+
 .alert {
     color: red;
 }
