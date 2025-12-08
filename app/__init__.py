@@ -16,18 +16,15 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object("config.Config")
 
-    # Initialize extensions
     mail.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
 
-    # Upload folder
     upload_path = os.path.join(app.root_path, "static", "uploads")
     app.config["UPLOAD_FOLDER"] = upload_path
     os.makedirs(upload_path, exist_ok=True)
 
-    # User loader
     @login_manager.user_loader
     def load_user(user_id):
         admin = query(
