@@ -3,7 +3,11 @@
 {% extends 'base.html' %}
 {% block content %}
     <div class="container form mt-5">
-        <h4 class="text-center m-5">Update Status for Complaint #{{ complaint.id }}</h4>
+        <div class="mb-4">
+            <h4 class=" text-center p-5">Update Status</h4>
+            <h5 class="text-muted mx-3">Complaint ID: <span class=" text-dark fw-bold">#{{ complaint.complaint_id }}</span></h5>
+            <h5 class="text-muted mx-3">Complaint Title: <span class="text-dark fw-bold">{{ complaint.title }}</span></h5>
+        </div>
 
         <form method="POST">
             <div class="mb-4 mx-3">
