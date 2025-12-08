@@ -147,7 +147,8 @@
                     <h6 class="text-center text-muted mt-3">No complaints found.</h6>
                 {% endif %}
             {% endif %} 
-
+            
+            {% if Page %}
             <div class="d-flex justify-content-center align-items-center mt-4 mb-5 gap-3">
                 {% if page > 1 %}
                 <a href="?page={{ page - 1 }}{% if status %}&status={{status}}{% endif %}" class="nav-link badge bg-secondary">Previous</a>
@@ -159,6 +160,7 @@
                     class="nav-link badge bg-secondary">Next</a>
                 {% endif %}
             </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

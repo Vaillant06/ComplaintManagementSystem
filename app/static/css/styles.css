@@ -140,14 +140,14 @@ table thead th {
     justify-content: center;
 }
 
-.card {
+.cards {
     background: #f8f9fa;
     transition: all 0.2s ease;
     border: 1px solid #dee2e6;
     cursor: pointer;
 }
 
-.card:hover {
+.cards:hover {
     background: #e9ecef;
     transform: translateY(-4px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -163,6 +163,14 @@ table thead th {
 #chart-status {
     width: 500px;
     margin: auto;
+}
+
+.toggle {
+    position: absolute;
+    top: 50%;
+    right: 5%;
+    font-size: 1.3rem;
+    cursor: pointer;
 }
 
 .alert {
