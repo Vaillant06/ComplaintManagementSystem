@@ -25,8 +25,11 @@ CREATE TABLE staff (
     staff_id VARCHAR(10) PRIMARY KEY,
     staff_name VARCHAR(100) NOT NULL,
     department_id INTEGER NOT NULL,
-    email VARCHAR(255),
-    phone VARCHAR(50),
+    email VARCHAR(255) not null,
+    pasword varchar(100) not null,
+    phone VARCHAR(50) not null,
+    role varchar(20) default 'staff',
+    last_login TIMESTAMP
 
     FOREIGN KEY (department_id) REFERENCES departments(department_id)
 );
@@ -40,6 +43,7 @@ CREATE TABLE users (
     username VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    role varchar(20) default 'user',
     last_login TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW()
 );
