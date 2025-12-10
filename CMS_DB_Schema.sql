@@ -25,8 +25,11 @@ CREATE TABLE staff (
     staff_id VARCHAR(10) PRIMARY KEY,
     staff_name VARCHAR(100) NOT NULL,
     department_id INTEGER NOT NULL,
-    email VARCHAR(255),
+    email VARCHAR(255) NOT NULL,
+    password   VARCHAR(100) NOT NULL,
     phone VARCHAR(50),
+    role VARCHAR(20) DEFAULT 'staff',
+    last_login TIMESTAMP
 
     FOREIGN KEY (department_id) REFERENCES departments(department_id)
 );

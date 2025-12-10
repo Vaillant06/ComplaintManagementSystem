@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 from dotenv import load_dotenv
-from app.routes import auth, complaints, admin, home, user, contact     
+from app.routes import auth, complaints, admin, staff, home, user, contact     
 from app.db import query
 from app.user_wrapper import UserWrapper
 from app.extensions import bcrypt, mail
@@ -30,25 +30,36 @@ def create_app():
     # User loader
     @login_manager.user_loader
     def load_user(user_id):
-        admin = query(
-            "SELECT admin_id, admin_name AS name, email FROM admins WHERE admin_id = %s",
-            (user_id,),
-            fetchone=True,
-        )
-        if admin:
-            return UserWrapper(admin["admin_id"], admin["name"], admin["email"], True)
+        if user_id.startswith(("E", "W", "P", "H")):  
+            staff = query(
+                "SELECT staff_id, staff_name, email FROM staff WHERE staff_id=%s",
+                (user_id,),
+                fetchone=True
+            )
+            if staff:
+                return UserWrapper(staff["staff_id"], staff["staff_name"], staff["email"], "staff")
 
-        user = query(
-            "SELECT user_id, username AS name, email FROM users WHERE user_id = %s",
-            (user_id,),
-            fetchone=True,
-        )
-        if user:
-            return UserWrapper(user["user_id"], user["name"], user["email"], False)
+        if user_id.isdigit():
+            admin = query(
+                "SELECT admin_id, admin_name, email FROM admins WHERE admin_id=%s",
+                (user_id,),
+                fetchone=True
+            )
+            if admin:
+                return UserWrapper(admin["admin_id"], admin["admin_name"], admin["email"], "admin")
+
+            user = query(
+                "SELECT user_id, username, email FROM users WHERE user_id=%s",
+                (user_id,),
+                fetchone=True
+            )
+            if user:
+                return UserWrapper(user["user_id"], user["username"], user["email"], "user")
 
         return None
 
-    for bp in (auth.bp, complaints.bp, admin.bp, home.bp, user.bp, contact.bp):
+
+    for bp in (auth.bp, complaints.bp, admin.bp, staff.bp, home.bp, user.bp, contact.bp):
         app.register_blueprint(bp)
 
     return app
