@@ -1,7 +1,6 @@
-__pycache__/
-*.pyc
-
 .env
 .vscode/
 app/static/uploads/*
 !app/static/uploads/.gitkeep
+__pycache__/
+*.pyc
