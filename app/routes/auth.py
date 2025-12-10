@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required
 from app.db import query
-from app.extensions import bcrypt  # ← FIXED
+from app.extensions import bcrypt 
 from app.user_wrapper import UserWrapper
+import re
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -17,6 +18,11 @@ def register():
 
         if not name or not email or not password:
             flash("All fields are required!", "alert")
+            return redirect(url_for("auth.register"))
+
+        pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{7,}$"
+        if not re.match(pattern, password):
+            flash("Password should contain one upper case, one lower case, numbers and special characters", "alert")
             return redirect(url_for("auth.register"))
 
         if password != confirm_password:
@@ -42,6 +48,10 @@ def register():
         return redirect(url_for("auth.login"))
 
     return render_template("register.html")
+
+def is_valid_password(password):
+    
+    return bool()
 
 
 @bp.route("/login", methods=["GET", "POST"])
