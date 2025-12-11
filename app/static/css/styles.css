@@ -58,13 +58,22 @@ body {
 .user-info {
     margin-left: 10px;
     border-bottom: 1px solid black;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .user-info button {
     display: flex;
     border-radius: 12px;
     padding: 20px;
+}
+
+.complaint-count {
+    margin-left: 10px;
+    background-color: rgb(70, 69, 69);
+    color: yellow;
+    padding: 20px;
+    border: 2px solid rgb(70, 69, 69);
+    border-radius: 12px;
 }
 
 .redirection {
@@ -89,6 +98,10 @@ body {
     border-radius: 20px;
     margin-top: 150px;
     width: max-content;
+}
+
+.update-card {
+    width: 600px;
 }
 
 .landing-page {

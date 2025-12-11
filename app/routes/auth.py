@@ -74,8 +74,7 @@ def login():
             return redirect(url_for("admin.admin_home"))
 
 
-        staff = query("SELECT * FROM staff WHERE email=%s", (email,), fetchone=True)
-        print(staff["password"])
+        staff = query("SELECT * FROM staff WHERE email=%s", (email,), fetchone=True)    
         if staff and staff["password"] == password:
             query(
                 "UPDATE staff SET last_login = NOW() WHERE staff_id = %s",

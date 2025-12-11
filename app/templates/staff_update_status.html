@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="update-card container px-4 form mt-5">
+    <div class="mb-4">
+        <h4 class=" text-center p-5">Update Status</h4>
+        <p class="text-muted mx-3">Staff Department: <span class=" text-dark fw-bold">{{ department.department_name }}</span></p>
+        <p class="text-muted mx-3">Staff ID: <span class=" text-dark fw-bold">{{ staff.staff_id }}</span></p>
+        <p class="text-muted mx-3">Complaint ID: <span class=" text-dark fw-bold">#{{ complaint.complaint_id }}</span></p>
+        <p class="text-muted mx-3">Complaint Title: <span class="text-dark fw-bold">{{ complaint.title }}</span></p>
+    </div>
+
+
+    <form method="POST" action="{{ url_for('staff.update_status', complaint_id=complaint.complaint_id) }}">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select mb-3">
+            <option value="{{ complaint.status }}">{{ complaint.status }}</option>
+            <option value="Resolved">Resolved</option>
+        </select>
+
+        <label for="staff_comment" class="form-label">Staff Comment</label>
+        <input 
+            type="text" 
+            name="staff_comment" 
+            id="staff_comment" 
+            class="form-control mb-3" 
+            placeholder="Add comments"
+            required
+        >
+
+        <div class="mb-3 position-relative">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        
+            <i class="bi bi-eye-slash toggle" onclick="togglePassword('password', this)"></i>  
+        </div>
+
+        <div class="redirection">
+            <button class="btn btn-success mb-2">
+                <i class="bi bi-arrow-up me-1"></i>
+                Update
+            </button>
+            <a class="btn btn-danger mb-3" href="{{ url_for('staff.staff_dashboard') }}">
+                <i class="bi bi-x-circle me-1"></i>
+                Cancel
+            </a>
+        </div>
+
+        <!--  FLASH MESSAGES -->
+        <div class="flash-messages text-center mt-3">
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+    </form>
+
+    <script src="{{ url_for('static', filename='js/togglePassword.js') }}"></script>
+</div>
+    {% endblock %}

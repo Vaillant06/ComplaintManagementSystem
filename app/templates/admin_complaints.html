@@ -49,7 +49,7 @@
                         <th>Name</th>
                         <th>Title</th>
                         <th>Status</th>
-                        <th>Created At</th>
+                        <th>Created At</th> 
                         <th>Details</th>
                         <th>Action</th>
                     </tr>
@@ -175,44 +175,51 @@
                         </p>
 
                         <p><strong>Created AT : </strong> {{ c.created_at }}</p>
-
+                        <p><strong>Attaachment: </strong></p>
                         {% if c.attachment %}
                         <a href="{{ url_for('static', filename='uploads/' ~ c.attachment) }}" target="_blank" class="btn btn-sm btn-outline-info mb-3">
                             View attachment
                         </a>
+                        {% else %}
+                        <p>No attachment uploaded</p>
                         {% endif %}
-
-                        <!-- ADMIN COMMENT -->
-                        <form method="POST" action="{{ url_for('admin.add_comment', complaint_id=c.complaint_id) }}">
-                            {% if c.status == "Resolved" or c.status == "Rejected" %}
-                                <div class="mb-2">
-                                    <label for="admin_comment" class="form-label"><strong>Admin Comment</strong></label>
-                                    <input id="admin_comment" type="text" name="admin_comment" class="form-control mt-1" value="{{ c.admin_comment or '' }}" disabled>
-                                </div>
-                                <button type="submit" class="btn btn-success mt-1 disabled">
-                                    <i class="bi bi-plus-lg me-1"></i>
-                                    Add Comment
-                                </button>
+                        
+                        <div>
+                            <label for="admin_comment" class="form-label"><strong>Admin Comment: </strong></label>
+                            {% if c.admin_comment %}
+                            <input type="text" class="form-control mb-3" value="{{ c.admin_comment }}" disabled>
                             {% else %}
-                                <div class="mb-2">
-                                    <label for="admin_comment" class="form-label"><strong>Admin Comment</strong></label>
-                                    <input id="admin_comment" type="text" name="admin_comment" class="form-control mt-1" value="{{ c.admin_comment or '' }}">
-                                </div>
-                                <button type="submit" class="btn btn-success mt-1">
-                                    <i class="bi bi-plus-lg me-1"></i>
-                                    Add Comment
-                                </button>
+                            <input type="text" class="form-control mb-3" placeholder="No comments yet!" disabled>
                             {% endif %}
-                        </form>
+                        </div>
+                        <div>
+                            <label for="staff_comment" class="form-label"><strong>Staff Comment: </strong></label>
+                            {% if c.staff_comment %}
+                            <input type="text" class="form-control mb-3" value="{{ c.staff_comment }}" disabled>
+                            {% else %}
+                            <input type="text" class="form-control mb-3" placeholder="No comments yet!" disabled>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <div class="modal-footer">
-                        {% if c.status == "Pending" %}
-                            <a href="{{ url_for('admin.assign_complaint', complaint_id=c.complaint_id, department_id=c.department_id) }}"
-                            class="btn btn-primary">
-                                <i class="bi bi-person-check me-1"></i>
-                                Assign 
-                            </a>
+                        {% if c.status == "In Progress" %}
+                        <a href="{{ url_for('admin.edit_status', complaint_id=c.complaint_id) }}" class="btn btn-success disabled">
+                            <span><i class="bi bi-person-check me-1"></i></span>
+                            Work Assigned
+                        </a>
+
+                        {% elif c.status == "Resolved" %}
+                        <a href="{{ url_for('admin.edit_status', complaint_id=c.complaint_id) }}" class="btn btn-success disabled">
+                            <span><i class="bi bi-check2-circle me-1"></i></span>
+                            Issue Resolved
+                        </a>
+
+                        {% elif c.status == "Pending" %}
+                        <a href="{{ url_for('admin.edit_status', complaint_id=c.complaint_id) }}" class="btn btn-success">
+                            <span><i class="bi bi-person-add"></i></span>
+                            Assign
+                        </a>
                         {% endif %}
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
                             <i class="bi bi-x-circle me-1"></i>
