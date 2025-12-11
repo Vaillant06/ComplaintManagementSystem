@@ -48,8 +48,8 @@ def new_complaint():
 
         latest_complaint = query(
             """
-            INSERT INTO complaints (user_id, department_id, title, description, attachment)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO complaints (user_id, department_id, title, description, attachment, created_at)
+            VALUES (%s, %s, %s, %s, %s, NOW())
             RETURNING complaint_id, status, title
             """,
             (current_user.id, department_id, title, description, attachment_name),

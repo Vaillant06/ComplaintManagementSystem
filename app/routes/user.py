@@ -19,7 +19,6 @@ def user_dashboard():
     )
 
     ITEMS_PER_PAGE = 10
-    
     status = request.args.get("status")
 
     page = request.args.get("page", 1, type=int)
@@ -32,10 +31,10 @@ def user_dashboard():
             FROM complaints c
             JOIN departments d ON c.department_id = d.department_id
             JOIN users u ON c.user_id = u.user_id
-            WHERE c.status = %s AND u.user_id = %s
+            WHERE c.status = %s AND u.user_id=%s
             """,
-            (status, current_user.id,),
-            fetchone=True
+            (status, current_user.id),
+            fetchone=True,
         )[0]
     else:
         total_count = query(
@@ -44,10 +43,10 @@ def user_dashboard():
             FROM complaints c
             JOIN departments d ON c.department_id = d.department_id
             JOIN users u ON c.user_id = u.user_id
-            WHERE u.user_id = %s
+            WHERE u.user_id=%s
             """,
             (current_user.id,),
-            fetchone=True
+            fetchone=True,
         )[0]
 
     total_pages = (total_count + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
@@ -55,7 +54,7 @@ def user_dashboard():
     if status:
         rows = query(
             """
-            SELECT c.*, u.*, d.department_name
+            SELECT c.*, u.username, d.department_name
             FROM complaints c
             JOIN users u ON c.user_id = u.user_id
             JOIN departments d ON d.department_id = c.department_id
@@ -70,7 +69,7 @@ def user_dashboard():
     else:
         rows = query(
             """
-            SELECT c.*, u.*, d.department_name
+            SELECT c.*, u.username, d.department_name
             FROM complaints c
             JOIN users u ON c.user_id = u.user_id
             JOIN departments d ON d.department_id = c.department_id
@@ -89,14 +88,17 @@ def user_dashboard():
     )[0]
 
     for c in rows:
+        print(c["created_at"])
         c["created_at"] = (c["created_at"] + timedelta(hours=5, minutes=30))\
                             .strftime("%H:%M | %d %B %Y")
 
         if c["assigned_at"]:
             c["assigned_at"] = (c["assigned_at"] + timedelta(hours=5, minutes=30))\
                             .strftime("%d %B %Y")
-        else:
-            c["assigned_at"] = ""
+
+        if c["resolved_at"]:
+            c["resolved_at"] = (c["resolved_at"] + timedelta(hours=5, minutes=30))\
+                            .strftime("%d %B %Y")
 
     if user["last_login"]:
         user["last_login"] = (user["last_login"] + timedelta(hours=5, minutes=30))\
