@@ -162,21 +162,45 @@ def update_status(complaint_id):
         if old_status == new_status:
             flash("Status Unchanged!", "info")
             return redirect(url_for("staff.update_status", complaint_id=complaint_id))
+        
+        else:
+            query(
+                """
+                UPDATE complaints
+                SET status = %s,
+                staff_comment = %s,
+                assigned_to = NULL,
+                resolved_at = CASE WHEN %s = 'Resolved' THEN NOW() ELSE NULL END
+                WHERE complaint_id = %s
+                """,
+                (new_status, staff_comment, new_status, complaint_id),
+                commit=True,
+            )
 
-        query(
-            """
-            UPDATE complaints
-            SET status = %s,
-            staff_comment = %s,
-            assigned_to = NULL,
-            resolved_at = CASE WHEN %s = 'Resolved' THEN NOW() ELSE NULL END
-            WHERE complaint_id = %s
-            """,
-            (new_status, staff_comment, new_status, complaint_id),
-            commit=True,
-        )
+            complaint_data = query(
+                """
+                SELECT u.email, u.username, c.title, c.department_id
+                FROM complaints c
+                JOIN users u ON c.user_id = u.user_id
+                WHERE c.complaint_id = %s
+                """,
+                (complaint_id,),
+                fetchone=True,
+            )
 
-        flash("Status changed!", "success")
-        return redirect(url_for("staff.staff_dashboard"))
+            if complaint_data:
+                send_notification(
+                    to=complaint_data["email"],
+                    subject="Complaint Resolved",
+                    body=f"Hello {complaint_data['username']},\n\n"
+                    f"Your complaint titled '{complaint_data['title']}' has been resolved successfully.\n"
+                    f"Old Status: {old_status}\n"
+                    f"New Status: {new_status}.\n"
+                    f"View your complaint for more details.\n"
+                    f"Regards,\nAdmin Team",
+                )
+
+            flash("Status changed!", "success")
+            return redirect(url_for("staff.staff_dashboard"))
 
     return render_template("staff_update_status.html", staff=staff, department=department, complaint=complaint)

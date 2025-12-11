@@ -55,7 +55,7 @@ def user_dashboard():
     if status:
         rows = query(
             """
-            SELECT c.*, d.department_name
+            SELECT c.*, u.*, d.department_name
             FROM complaints c
             JOIN users u ON c.user_id = u.user_id
             JOIN departments d ON d.department_id = c.department_id
@@ -70,7 +70,7 @@ def user_dashboard():
     else:
         rows = query(
             """
-            SELECT c.*, d.department_name
+            SELECT c.*, u.*, d.department_name
             FROM complaints c
             JOIN users u ON c.user_id = u.user_id
             JOIN departments d ON d.department_id = c.department_id

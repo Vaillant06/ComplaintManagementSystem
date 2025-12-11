@@ -70,7 +70,6 @@ def admin_complaints():
             fetchone=True
         )[0]
 
-
     total_pages = (total_count + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
 
     if status:
@@ -110,6 +109,16 @@ def admin_complaints():
     for c in rows:
         c["created_at"] = (c["created_at"] + timedelta(hours=5, minutes=30))\
                             .strftime("%H:%M | %d-%B-%Y")
+
+        if c["assigned_at"]:
+            c["assigned_at"] = (
+                c["assigned_at"] + timedelta(hours=5, minutes=30)
+            ).strftime("%H:%M | %d - %B - %Y")
+
+        if c["resolved_at"]:
+            c["resolved_at"] = (
+                c["resolved_at"] + timedelta(hours=5, minutes=30)
+            ).strftime("%H:%M | %d - %B - %Y")
 
     return render_template("admin_complaints.html", complaints=rows, status=status, total=total, total_pages=total_pages, page=page)
 
@@ -410,10 +419,14 @@ def edit_status(complaint_id):
                 query(
                     """
                     UPDATE complaints
-                    SET assigned_to=NULL, assigned_at=NULL, admin_comment=%s
+                    SET status=%s, assigned_to=NULL, assigned_at=NULL, admin_comment=%s
                     WHERE complaint_id=%s 
                     """,
-                    (complaint_id, admin_comment,),
+                    (
+                        new_status,
+                        admin_comment,
+                        complaint_id,
+                    ),
                     commit=True,
                 )
 
@@ -421,12 +434,16 @@ def edit_status(complaint_id):
                 query(
                     """
                     UPDATE complaints
-                    SET assigned_to=NULL, assigned_at=NULL, resolved_at=NOW(), admin_comment=%s
+                    SET status=%s, assigned_to=NULL, assigned_at=NULL, resolved_at=NOW(), admin_comment=%s
                     WHERE complaint_id=%s 
                     """,
-                    (complaint_id, admin_comment,),
+                    (
+                        new_status,
+                        admin_comment,
+                        complaint_id,
+                    ),
                     commit=True,
-                )             
+                )
 
             flash("Status updated successfully!", "success")
             return redirect(url_for("admin.admin_complaints"))

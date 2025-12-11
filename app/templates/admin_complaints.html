@@ -41,7 +41,7 @@
         <!-- COMPLAINTS TABLE -->
         <div class="card-body p-0">
             {% if complaints %}
-            <table class="table table-hover  mb-0">
+            <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
                         <th>ID</th>
@@ -174,7 +174,9 @@
                         {% endif %}
                         </p>
 
-                        <p><strong>Created AT : </strong> {{ c.created_at }}</p>
+                        <p><strong>Created At : </strong>{{ c.created_at }}</p>
+                        <p><strong>Assigned At : </strong>{{ c.assigned_at }}</p>
+                        <p><strong>Resolved At : </strong>{{ c.resolved_at }}</p>
                         <p><strong>Attaachment: </strong></p>
                         {% if c.attachment %}
                         <a href="{{ url_for('static', filename='uploads/' ~ c.attachment) }}" target="_blank" class="btn btn-sm btn-outline-info mb-3">
