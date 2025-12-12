@@ -1,0 +1,63 @@
+<!-- EDIT STATUS -->
+
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container form mt-5">
+        <div class="mb-4">
+            <h4 class=" text-center p-5">Update Status</h4>
+            <h5 class="text-muted mx-3">Complaint ID: <span class=" text-dark fw-bold">#{{ complaint.complaint_id }}</span></h5>
+            <h5 class="text-muted mx-3">Complaint Title: <span class="text-dark fw-bold">{{ complaint.title }}</span></h5>
+        </div>
+
+        <form method="POST">
+            <div class="mb-4 mx-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select mb-3">
+                    {% if complaint.status == "Pending" %}
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Rejected">Rejected</option>
+                    {% else %}
+                        <option value="In Progress">In Progress</option>
+                    {% endif %}                    
+                </select>
+                <div class="mb-2">
+                    <label for="admin_comment" class="form-label">Admin Comment</label>
+                    <input id="admin_comment" type="text" name="admin_comment" class="form-control"
+                        value="{{ complaint.admin_comment or '' }}">
+                </div>
+                {% if complaint.status == "In Progress" %}
+                <p class="text-success text-center my-3">Work has been assigned. Waiting to be resolved...</p>
+                {% endif %}
+            </div>
+            <div class="redirection">
+                {% if complaint.status == "Pending" %}
+                <button class="btn btn-success mb-2">
+                    <i class="bi bi-arrow-up me-1"></i>
+                    Update
+                </button>
+                {% else %}
+                <button class="btn btn-success mb-2 disabled">
+                    <i class="bi bi-arrow-up me-1"></i>
+                    Update
+                </button>
+                {% endif %}
+                <a class="btn btn-danger mb-5" href="{{ url_for('admin.admin_complaints') }}">
+                    <i class="bi bi-x-circle me-1"></i>
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    <div class="flash-messages text-center mt-3">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <p class="{{ category }}">{{ message }}</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+{% endblock %}

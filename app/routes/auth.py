@@ -49,10 +49,6 @@ def register():
 
     return render_template("register.html")
 
-def is_valid_password(password):
-    
-    return bool()
-
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -60,37 +56,57 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
 
-        user = query("SELECT * FROM users WHERE email=%s", (email,), fetchone=True)
-        if user and bcrypt.check_password_hash(user["password"], password):
-
-            query(
-                "UPDATE users SET last_login = NOW() WHERE user_id = %s",
-                (user["user_id"],),
-                commit=True,
-            )
-
-            login_user(
-                UserWrapper(user["user_id"], user["username"], user["email"], False)
-            )
-
-            return redirect(url_for("user.user_dashboard"))
-
         admin = query("SELECT * FROM admins WHERE email=%s", (email,), fetchone=True)
         if admin and bcrypt.check_password_hash(admin["password"], password):
 
             query(
                 "UPDATE admins SET last_login = NOW() WHERE admin_id = %s",
                 (admin["admin_id"],),
-                commit=True,
+                commit=True
             )
 
             login_user(
                 UserWrapper(
-                    admin["admin_id"], admin["admin_name"], admin["email"], True
+                    admin["admin_id"], admin["admin_name"], admin["email"], "admin"
                 )
             )
 
             return redirect(url_for("admin.admin_home"))
+
+
+        staff = query("SELECT * FROM staff WHERE email=%s", (email,), fetchone=True)    
+        if staff and staff["password"] == password:
+            query(
+                "UPDATE staff SET last_login = NOW() WHERE staff_id = %s",
+                (staff["staff_id"],),
+                commit=True
+            )
+
+            login_user(
+                UserWrapper(
+                    staff["staff_id"], staff["staff_name"], staff["email"], "staff"
+                )
+            )
+
+            return redirect(url_for("staff.staff_dashboard"))
+
+
+        user = query("SELECT * FROM users WHERE email=%s", (email,), fetchone=True)
+        if user and bcrypt.check_password_hash(user["password"], password):
+
+            query(
+                "UPDATE users SET last_login = NOW() WHERE user_id = %s",
+                (user["user_id"],),
+                commit=True
+            )
+
+            login_user(
+                UserWrapper(
+                    user["user_id"], user["username"], user["email"], "user"
+                )
+            )
+
+            return redirect(url_for("user.user_dashboard"))
 
         flash("Invalid credentials!", "alert")
         return redirect(url_for("auth.login"))

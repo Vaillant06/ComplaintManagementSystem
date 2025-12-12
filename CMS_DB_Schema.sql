@@ -25,8 +25,11 @@ CREATE TABLE staff (
     staff_id VARCHAR(10) PRIMARY KEY,
     staff_name VARCHAR(100) NOT NULL,
     department_id INTEGER NOT NULL,
-    email VARCHAR(255),
-    phone VARCHAR(50),
+    email VARCHAR(255) not null,
+    pasword varchar(100) not null,
+    phone VARCHAR(50) not null,
+    role varchar(20) default 'staff',
+    last_login TIMESTAMP
 
     FOREIGN KEY (department_id) REFERENCES departments(department_id)
 );
@@ -40,6 +43,7 @@ CREATE TABLE users (
     username VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    role varchar(20) default 'user',
     last_login TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW()
 );
@@ -55,7 +59,8 @@ CREATE TABLE complaints (
     title VARCHAR(200) NOT NULL,
     description TEXT NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'Pending',
-    admin_comment TEXT,               
+    admin_comment TEXT,     
+    staff_comment TEXT,          
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     assigned_to VARCHAR(10),  
     assigned_at TIMESTAMP,     
@@ -63,6 +68,17 @@ CREATE TABLE complaints (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (department_id) REFERENCES departments(department_id),
     FOREIGN KEY (assigned_to) REFERENCES staff(staff_id)
+);
+
+--6. USER REVIEW TABLE
+
+CREATE TABLE user_review (
+    name varchar(100) NOT NULL,
+    email varchar(255) NOT NULL,
+    rating varchar(10) NOT NULL,
+    user_message TEXT NOT NULL,
+    admin_reply TEXT,
+    created_at TIMESTAMP
 );
 
 
