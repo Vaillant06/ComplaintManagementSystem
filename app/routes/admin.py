@@ -70,7 +70,6 @@ def admin_complaints():
             fetchone=True
         )[0]
 
-
     total_pages = (total_count + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
 
     if status:
@@ -110,6 +109,16 @@ def admin_complaints():
     for c in rows:
         c["created_at"] = (c["created_at"] + timedelta(hours=5, minutes=30))\
                             .strftime("%H:%M | %d-%B-%Y")
+
+        if c["assigned_at"]:
+            c["assigned_at"] = (
+                c["assigned_at"] + timedelta(hours=5, minutes=30)
+            ).strftime("%H:%M | %d - %B - %Y")
+
+        if c["resolved_at"]:
+            c["resolved_at"] = (
+                c["resolved_at"] + timedelta(hours=5, minutes=30)
+            ).strftime("%H:%M | %d - %B - %Y")
 
     return render_template("admin_complaints.html", complaints=rows, status=status, total=total, total_pages=total_pages, page=page)
 
@@ -351,6 +360,7 @@ def edit_status(complaint_id):
 
     if request.method == "POST":
         new_status = request.form["status"]
+        admin_comment = request.form["admin_comment"]
 
         old_status = query(
             "SELECT status FROM complaints WHERE complaint_id=%s",
@@ -359,8 +369,8 @@ def edit_status(complaint_id):
         )["status"]
 
         if new_status == old_status:
-            flash("Status is unchanged.", "info")
-            return redirect(url_for("admin.admin_complaints"))
+            flash("Status is unchanged!", "info")
+            return redirect(url_for("admin.edit_status", complaint_id=complaint_id))
 
         else:
             complaint_data = query(
@@ -398,20 +408,25 @@ def edit_status(complaint_id):
                     f"Regards,\nAdmin Team",
                 )
 
+            if new_status == "In Progress":
                 query(
-                    "UPDATE complaints SET status=%s, assigned_to=%s, assigned_at=NOW() WHERE complaint_id=%s",
-                    (new_status, staff_id, complaint_id),
+                    "UPDATE complaints SET status=%s, assigned_to=%s, admin_comment=%s, assigned_at=NOW() WHERE complaint_id=%s",
+                    (new_status, staff_id, admin_comment, complaint_id),
                     commit=True,
                 )
 
-            if new_status == "Rejected":
+            elif new_status == "Rejected":
                 query(
                     """
                     UPDATE complaints
-                    SET assigned_to=NULL, assigned_at=NULL, admin_comment='Rejected due to duplicate complaint'
+                    SET status=%s, assigned_to=NULL, assigned_at=NULL, admin_comment=%s
                     WHERE complaint_id=%s 
                     """,
-                    (complaint_id,),
+                    (
+                        new_status,
+                        admin_comment,
+                        complaint_id,
+                    ),
                     commit=True,
                 )
 
@@ -419,10 +434,14 @@ def edit_status(complaint_id):
                 query(
                     """
                     UPDATE complaints
-                    SET assigned_to=NULL, assigned_at=NULL, resolved_at=NOW(), admin_comment='Resolved the issue'
+                    SET status=%s, assigned_to=NULL, assigned_at=NULL, resolved_at=NOW(), admin_comment=%s
                     WHERE complaint_id=%s 
                     """,
-                    (complaint_id,),
+                    (
+                        new_status,
+                        admin_comment,
+                        complaint_id,
+                    ),
                     commit=True,
                 )
 
@@ -433,7 +452,7 @@ def edit_status(complaint_id):
         "SELECT * FROM complaints WHERE complaint_id=%s", (complaint_id,), fetchone=True
     )
 
-    return render_template("edit_status.html", complaint=comp)
+    return render_template("admin_edit_status.html", complaint=comp)
 
 
 # ------------------------------
@@ -455,37 +474,4 @@ def add_comment(complaint_id):
         )
 
     flash("Comment updated successfully", "success")
-    return redirect(url_for("admin.admin_complaints"))
-
-
-# -----------------------------
-#    ADMIN ASSIGN COMPLAINT
-# -----------------------------
-@bp.route(
-    "/complaints/<int:complaint_id>/<int:department_id>/assign", methods=["GET", "POST"]
-)
-@login_required
-def assign_complaint(complaint_id, department_id):
-    if not current_user.is_admin:
-        abort(403)
-
-    staff = query(
-        "SELECT staff_id FROM staff WHERE department_id=%s LIMIT 1",
-        (department_id,),
-        fetchone=True,
-    )
-
-    if not staff:
-        flash("No staff found in this department!", "danger")
-        return redirect(url_for("admin.admin_complaints"))
-
-    staff_id = staff["staff_id"]
-
-    query(
-        "UPDATE complaints SET status='In Progress', assigned_to=%s, assigned_at=NOW() WHERE complaint_id=%s",
-        (staff_id, complaint_id),
-        commit=True,
-    )
-
-    flash("Complaint assigned successfully!", "success")
     return redirect(url_for("admin.admin_complaints"))

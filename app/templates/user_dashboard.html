@@ -94,34 +94,20 @@
                                 Filed At
                             </th>
                             <th>
-                                <i class="bi bi-person-badge me-1"></i>
-                                Assigned To
-                            </th>
-                            <th>
-                                <i class="bi bi-clipboard-x me-1"></i>
-                                Assigned On
-                            </th>
-                            <th>
                                 <i class="bi bi-check-circle me-1"></i>
                                 Status
                             </th>   
                             <th>
-                                <i class="bi bi-chat-left-text me-1"></i>
-                                Admin Comments
+                                <i class="bi bi-plus-circle me-1"></i>
+                                More Details
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for c in complaints %}
                             <tr>
-                                <td>{{c.title}}</td>
-                                <td>{{c.created_at}}</td>
-                                <td>{{c.assigned_to}}</td>
-                                {% if c.assigned_at %}
-                                    <td>{{ c.assigned_at }}</td>
-                                {% else %}
-                                    <td>---</td>
-                                {% endif %}
+                                <td><strong>{{ c.title }}</strong></td>
+                                <td class="text-start">{{ c.created_at }}</td>
                                 <td>
                                     {% if c.status == "Pending" %}
                                     <span class="badge bg-warning text-dark">Pending</span>
@@ -133,7 +119,13 @@
                                     <span class="badge bg-danger">Rejected</span>
                                     {% endif %}
                                 </td>
-                                <td>{{c.admin_comment}}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                                        data-bs-target="#complaintModal{{ c.complaint_id }}">
+                                        <i class="bi bi-eye"></i>
+                                        View
+                                    </button>   
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -148,17 +140,87 @@
                 {% endif %}
             {% endif %} 
             
-            {% if Page %}
+            <!-- MODAL FOR VIEWING COMPLAINT STATUS -->
+            {% for c in complaints %}
+            <div class="modal fade" id="complaintModal{{ c.complaint_id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+            
+                        <div class="modal-header bg-info text-white">
+                            <h5 class="modal-title">Complaint #{{ c.complaint_id }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+            
+                        <div class="modal-body">
+            
+                            <p><strong>User : </strong> {{ c.username }}</p>
+                            <p><strong>Title : </strong> {{ c.title }}</p>
+                            <p><strong>Department : </strong>{{ c.department_name }}</p>
+                            <p><strong>Description: </strong><br>{{ c.description }}</p>
+                            <p><strong>Status : </strong>
+                                {% if c.status == "Pending" %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                                {% elif c.status == "In Progress" %}
+                                <span class="badge bg-info text-dark">In Progress</span>
+                                {% elif c.status == "Resolved" %}
+                                <span class="badge bg-success">Resolved</span>
+                                {% elif c.status == "Rejected" %}
+                                <span class="badge bg-danger">Rejected</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Created At : </strong> {{ c.created_at }}</p>
+                            <p><strong>Resolved At: </strong> {{ c.resolved_at }}</p>
+                            <p><strong>Attachment: </strong></p>
+                            {% if c.attachment %}
+                            <a href="{{ url_for('static', filename='uploads/' ~ c.attachment) }}" target="_blank"
+                                class="btn btn-sm btn-outline-info mb-3">
+                                View attachment
+                            </a>
+                            {% else %}
+                            <p>No attachment uploaded</p>
+                            {% endif %}
+            
+                            <div>
+                                <label for="admin_comment" class="form-label"><strong>Admin Comment: </strong></label>
+                                {% if c.admin_comment %}
+                                <input type="text" class="form-control mb-3" value="{{ c.admin_comment }}" disabled>
+                                {% else %}
+                                <input type="text" class="form-control mb-3" placeholder="No comments yet!" disabled>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label for="staff_comment" class="form-label"><strong>Staff Comment: </strong></label>
+                                {% if c.staff_comment or c.status == "Rejected" %}
+                                <input type="text" class="form-control mb-3" value="{{ c.staff_comment }}" disabled>
+                                {% else %}
+                                <input type="text" class="form-control mb-3" placeholder="No comments yet!" disabled>
+                                {% endif %}
+                            </div>
+                        </div>
+            
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                                <i class="bi bi-x-circle me-1"></i>
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- PAGINATION FUNCTIONALITY-->
+            {% if page %}
             <div class="d-flex justify-content-center align-items-center mt-4 mb-5 gap-3">
                 {% if page > 1 %}
-                <a href="?page={{ page - 1 }}{% if status %}&status={{status}}{% endif %}" class="nav-link badge bg-secondary">Previous</a>
+                <a href="?page={{ page - 1 }}{% if status %}&status={{status}}{% endif %}" class="btn btn-secondary">Previous</a>
                 {% endif %}
             
                 <span>Page {{ page }} of {{ total_pages }}</span>
             
                 {% if page < total_pages %} <a href="?page={{ page + 1 }}{% if status %}&status={{status}}{% endif %}"
-                    class="nav-link badge bg-secondary">Next</a>
-                {% endif %}
+                    class="btn btn-secondary">Next</a>
+                    {% endif %}
             </div>
             {% endif %}
         </div>

@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 from dotenv import load_dotenv
-from app.routes import auth, complaints, admin,home, user, contact     
+from app.routes import auth, complaints, admin, staff, home, user, contact     
 from app.db import query
 from app.user_wrapper import UserWrapper
 from app.extensions import bcrypt, mail
@@ -57,7 +57,7 @@ def create_app():
         return None
 
 
-    for bp in (auth.bp, complaints.bp, admin.bp,  home.bp, user.bp, contact.bp):
+    for bp in (auth.bp, complaints.bp, admin.bp, staff.bp, home.bp, user.bp, contact.bp):
         app.register_blueprint(bp)
 
     return app
