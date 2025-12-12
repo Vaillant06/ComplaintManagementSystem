@@ -1,5 +1,5 @@
 from flask import Blueprint, flash, redirect, url_for, render_template, abort, request
-from flask_login import login_required , current_user
+from flask_login import login_required, current_user
 from datetime import timedelta
 from app.utils.email import send_notification
 from app.db import query
@@ -7,288 +7,176 @@ from app.db import query
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
+IST_OFFSET = timedelta(hours=5, minutes=30)
 
-# -----------------------------
-#       ADMIN DASHBOARD
-# -----------------------------
+
+def to_ist(dt):
+    return (dt + IST_OFFSET).strftime("%H:%M | %d-%b-%Y") if dt else None
+
+
+# ------------------------------------
+#            ADMIN DASHBOARD
+# ------------------------------------
 @bp.route("/")
 @login_required
 def admin_home():
     if not current_user.is_admin:
         abort(403)
-    
+
     admin = query(
         "SELECT last_login FROM admins WHERE admin_id=%s",
         (current_user.id,),
-        fetchone=True
+        fetchone=True,
     )
 
-    last_login = admin["last_login"]
-
-    if last_login:
-        last_login = (last_login + timedelta(hours=5, minutes=30))\
-                        .strftime("%H:%M | %d-%m-%Y")
-
+    last_login = to_ist(admin["last_login"]) if admin else None
     return render_template("admin_dashboard.html", last_login=last_login)
 
 
-# -----------------------------
-#     ADMIN VIEW COMPLAINTS
-# -----------------------------
-@bp.route("/complaints", methods=["GET"])
+# ------------------------------------
+#         VIEW COMPLAINTS
+# ------------------------------------
+@bp.route("/complaints")
 @login_required
 def admin_complaints():
-    if not current_user.is_admin:      
+    if not current_user.is_admin:
         abort(403)
 
     ITEMS_PER_PAGE = 10
     status = request.args.get("status")
-
     page = request.args.get("page", 1, type=int)
     offset = (page - 1) * ITEMS_PER_PAGE
 
-    if status:
-        total_count = query(
-            """
-            SELECT COUNT(*)
-            FROM complaints c
-            JOIN departments d ON c.department_id = d.department_id
-            JOIN users u ON c.user_id = u.user_id
-            WHERE c.status = %s
-            """,
-            (status,),
-            fetchone=True
-        )[0]
-    else:
-        total_count = query(
-            """
-            SELECT COUNT(*)
-            FROM complaints c
-            JOIN departments d ON c.department_id = d.department_id
-            JOIN users u ON c.user_id = u.user_id
-            """,
-            fetchone=True
-        )[0]
+    # Total count
+    where_clause = "WHERE c.status = %s" if status else ""
+    params = (status,) if status else ()
+
+    total_count = query(
+        f"""
+        SELECT COUNT(*)
+        FROM complaints c
+        JOIN departments d ON c.department_id = d.department_id
+        JOIN users u ON c.user_id = u.user_id
+        {where_clause}
+        """,
+        params,
+        fetchone=True,
+    )[0]
 
     total_pages = (total_count + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
 
-    if status:
-        rows = query(
-            """
-            SELECT c.*, u.username, d.department_name
-            FROM complaints c
-            JOIN users u ON c.user_id = u.user_id
-            JOIN departments d ON d.department_id = c.department_id
-            WHERE c.status = %s
-            ORDER BY c.created_at DESC
-            LIMIT %s OFFSET %s
-            """,
-            (status, ITEMS_PER_PAGE, offset),
-            fetchall=True,
-        )
+    # Query rows
+    rows = query(
+        f"""
+        SELECT c.*, u.username, d.department_name
+        FROM complaints c
+        JOIN users u ON c.user_id = u.user_id
+        JOIN departments d ON d.department_id = c.department_id
+        {where_clause}
+        ORDER BY c.created_at DESC
+        LIMIT %s OFFSET %s
+        """,
+        (*params, ITEMS_PER_PAGE, offset),
+        fetchall=True,
+    )
 
-    else:
-        rows = query(
-            """
-            SELECT c.*, u.username, d.department_id, d.department_name
-            FROM complaints c
-            JOIN users u ON c.user_id = u.user_id
-            JOIN departments d ON d.department_id = c.department_id
-            ORDER BY c.created_at DESC
-            LIMIT %s OFFSET %s
-            """,
-            (ITEMS_PER_PAGE, offset),
-            fetchall=True,
-        )
-
-    total = query(
-        "SELECT count(*) FROM complaints",
-        fetchone=True
-    )[0]
-
+    # Format timestamps
     for c in rows:
-        c["created_at"] = (c["created_at"] + timedelta(hours=5, minutes=30))\
-                            .strftime("%H:%M | %d-%B-%Y")
+        c["created_at"] = to_ist(c["created_at"])
+        if c.get("assigned_at"):
+            c["assigned_at"] = to_ist(c["assigned_at"])
+        if c.get("resolved_at"):
+            c["resolved_at"] = to_ist(c["resolved_at"])
 
-        if c["assigned_at"]:
-            c["assigned_at"] = (
-                c["assigned_at"] + timedelta(hours=5, minutes=30)
-            ).strftime("%H:%M | %d - %B - %Y")
+    total = query("SELECT COUNT(*) FROM complaints", fetchone=True)[0]
 
-        if c["resolved_at"]:
-            c["resolved_at"] = (
-                c["resolved_at"] + timedelta(hours=5, minutes=30)
-            ).strftime("%H:%M | %d - %B - %Y")
+    return render_template(
+        "admin_complaints.html",
+        complaints=rows,
+        status=status,
+        total=total,
+        total_pages=total_pages,
+        page=page,
+    )
 
-    return render_template("admin_complaints.html", complaints=rows, status=status, total=total, total_pages=total_pages, page=page)
 
-
-# -----------------------------
-#      COMPLAINTS SUMMARY
-# -----------------------------
-@bp.route("complaints_summary", methods=["GET", "POST"])
+# ------------------------------------
+#        COMPLAINT SUMMARIES
+# ------------------------------------
+@bp.route("/complaints_summary")
 @login_required
 def complaints_summary():
     if not current_user.is_admin:
         abort(403)
 
-    pending = query(
-        "SELECT count(*) FROM complaints WHERE status='Pending'",
-        fetchone=True
-    )[0]
+    statuses = ["Pending", "In Progress", "Resolved", "Rejected"]
+    departments = [1, 2, 3, 4]
 
-    progress = query(
-        "SELECT count(*) FROM complaints WHERE status='In Progress'",
-        fetchone=True
-    )[0]
+    # Summary counts
+    status_counts = {
+        s: query(
+            "SELECT COUNT(*) FROM complaints WHERE status=%s", (s,), fetchone=True
+        )[0]
+        for s in statuses
+    }
 
-    resolved = query(
-        "SELECT count(*) FROM complaints WHERE status='Resolved'",
-        fetchone=True
-    )[0]
+    dept_counts = {
+        d: query(
+            "SELECT COUNT(*) FROM complaints WHERE department_id=%s",
+            (d,),
+            fetchone=True,
+        )[0]
+        for d in departments
+    }
 
-    rejected = query(
-        "SELECT count(*) FROM complaints WHERE status='Rejected'",
-        fetchone=True
-    )[0]
+    # Status per department
+    dept_status_counts = {
+        d: {
+            s: query(
+                "SELECT COUNT(*) FROM complaints WHERE department_id=%s AND status=%s",
+                (d, s),
+                fetchone=True,
+            )[0]
+            for s in statuses
+        }
+        for d in departments
+    }
 
-    electrical = query(
-        "SELECT count(*) FROM complaints WHERE department_id=1",
-        fetchone=True
-    )[0]
-
-    water =  query(
-        "SELECT count(*) FROM complaints WHERE department_id=2",
-        fetchone=True
-    )[0]
-
-    public_works = query(
-        "SELECT count(*) FROM complaints WHERE department_id=3",
-        fetchone=True
-    )[0]
-
-    health_care = query(
-        "SELECT count(*) FROM complaints WHERE department_id=4",
-        fetchone=True
-    )[0]
-
-    total = query(
-        "SELECT count(*) FROM complaints",
-        fetchone=True
-    )[0]
-
-    electrical_pending = query(
-        "SELECT count(*) FROM complaints WHERE department_id=1 AND status='Pending'",
-        fetchone=True
-    )[0]
-
-    electrical_progress = query(
-        "SELECT count(*) FROM complaints WHERE department_id=1 AND status='In Progress'",
-        fetchone=True
-    )[0]
-
-    electrical_resolved = query(            
-        "SELECT count(*) FROM complaints WHERE department_id=1 AND status='Resolved'",
-        fetchone=True
-    )[0]    
-
-    electrical_rejected = query(        
-        "SELECT count(*) FROM complaints WHERE department_id=1 AND status='Rejected'",
-        fetchone=True
-    )[0]   
-
-    water_pending = query(
-        "SELECT count(*) FROM complaints WHERE department_id=2 AND status='Pending'",
-        fetchone=True,
-    )[0]
-
-    water_progress = query(
-        "SELECT count(*) FROM complaints WHERE department_id=2 AND status='In Progress'",
-        fetchone=True,
-    )[0]
-
-    water_resolved = query(
-        "SELECT count(*) FROM complaints WHERE department_id=2 AND status='Resolved'",
-        fetchone=True,
-    )[0]
-
-    water_rejected = query(
-        "SELECT count(*) FROM complaints WHERE department_id=2 AND status='Rejected'",
-        fetchone=True,
-    )[0]
-
-    pw_pending = query(
-        "SELECT count(*) FROM complaints WHERE department_id=3 AND status='Pending'",
-        fetchone=True,
-    )[0]
-
-    pw_progress = query(
-        "SELECT count(*) FROM complaints WHERE department_id=3 AND status='In Progress'",
-        fetchone=True,
-    )[0]
-
-    pw_resolved = query(
-        "SELECT count(*) FROM complaints WHERE department_id=3 AND status='Resolved'",
-        fetchone=True,
-    )[0]
-
-    pw_rejected = query(
-        "SELECT count(*) FROM complaints WHERE department_id=3 AND status='Rejected'",
-        fetchone=True,
-    )[0]
-
-    hc_pending = query(
-        "SELECT count(*) FROM complaints WHERE department_id=4 AND status='Pending'",
-        fetchone=True,
-    )[0]
-
-    hc_progress = query(
-        "SELECT count(*) FROM complaints WHERE department_id=4 AND status='In Progress'",
-        fetchone=True,
-    )[0]
-
-    hc_resolved = query(
-        "SELECT count(*) FROM complaints WHERE department_id=4 AND status='Resolved'",
-        fetchone=True,
-    )[0]
-
-    hc_rejected = query(
-        "SELECT count(*) FROM complaints WHERE department_id=4 AND status='Rejected'",
-        fetchone=True,
-    )[0]
+    total = query("SELECT COUNT(*) FROM complaints", fetchone=True)[0]
 
     return render_template(
-        "complaints_summary.html", 
-        pending=pending, 
-        progress=progress, 
-        resolved=resolved, 
-        rejected=rejected, 
-        electrical=electrical, 
-        water=water, 
-        public_works=public_works,      
-        health_care=health_care,
-        electrical_pending=electrical_pending,
-        electrical_progress=electrical_progress,
-        electrical_resolved=electrical_resolved,    
-        electrical_rejected=electrical_rejected,
-        water_pending=water_pending,
-        water_progress=water_progress,
-        water_resolved=water_resolved,
-        water_rejected=water_rejected,
-        pw_pending=pw_pending,
-        pw_progress=pw_progress,
-        pw_resolved=pw_resolved,
-        pw_rejected=pw_rejected,
-        hc_pending=hc_pending,
-        hc_progress=hc_progress,
-        hc_resolved=hc_resolved,
-        hc_rejected=hc_rejected,
-        total=total
+        "complaints_summary.html",
+        pending=status_counts["Pending"],
+        progress=status_counts["In Progress"],
+        resolved=status_counts["Resolved"],
+        rejected=status_counts["Rejected"],
+        electrical=dept_counts[1],
+        water=dept_counts[2],
+        public_works=dept_counts[3],
+        health_care=dept_counts[4],
+        electrical_pending=dept_status_counts[1]["Pending"],
+        electrical_progress=dept_status_counts[1]["In Progress"],
+        electrical_resolved=dept_status_counts[1]["Resolved"],
+        electrical_rejected=dept_status_counts[1]["Rejected"],
+        water_pending=dept_status_counts[2]["Pending"],
+        water_progress=dept_status_counts[2]["In Progress"],
+        water_resolved=dept_status_counts[2]["Resolved"],
+        water_rejected=dept_status_counts[2]["Rejected"],
+        pw_pending=dept_status_counts[3]["Pending"],
+        pw_progress=dept_status_counts[3]["In Progress"],
+        pw_resolved=dept_status_counts[3]["Resolved"],
+        pw_rejected=dept_status_counts[3]["Rejected"],
+        hc_pending=dept_status_counts[4]["Pending"],
+        hc_progress=dept_status_counts[4]["In Progress"],
+        hc_resolved=dept_status_counts[4]["Resolved"],
+        hc_rejected=dept_status_counts[4]["Rejected"],
+        total=total,
     )
 
-# -----------------------------
-#      COMPLAINT ANALYTICS
-# -----------------------------
+
+# ------------------------------------
+#        COMPLAINT ANALYTICS
+# ------------------------------------
 @bp.route("/complaints_analytics")
 @login_required
 def complaints_analytics():
@@ -306,37 +194,32 @@ def complaints_analytics():
         fetchall=True,
     )
 
-    labels = [row["department_name"] for row in rows]
-    counts = [row["total"] for row in rows]
+    labels = [r["department_name"] for r in rows]
+    counts = [r["total"] for r in rows]
 
     daily_rows = query(
         """
-    SELECT 
-        TO_CHAR(created_at, 'DD Mon') AS day,
-        DATE(created_at) AS day_order,
-        COUNT(*) AS total
-    FROM complaints
-    GROUP BY day, day_order
-    ORDER BY day_order;
-    """,
+        SELECT 
+            TO_CHAR(created_at, 'DD Mon') AS day,
+            DATE(created_at) AS day_order,
+            COUNT(*) AS total
+        FROM complaints
+        GROUP BY day, day_order
+        ORDER BY day_order
+        """,
         fetchall=True,
     )
 
-    trend_labels = [row["day"] for row in daily_rows]
-    trend_counts = [row["total"] for row in daily_rows]
+    trend_labels = [r["day"] for r in daily_rows]
+    trend_counts = [r["total"] for r in daily_rows]
 
     status_rows = query(
-        """
-    SELECT status, COUNT(*) AS total
-    FROM complaints
-    GROUP BY status
-    ORDER BY status;
-    """,
+        "SELECT status, COUNT(*) AS total FROM complaints GROUP BY status ORDER BY status",
         fetchall=True,
     )
 
-    status_labels = [row["status"] for row in status_rows]
-    status_counts = [row["total"] for row in status_rows]
+    status_labels = [r["status"] for r in status_rows]
+    status_counts = [r["total"] for r in status_rows]
 
     return render_template(
         "complaints_analytics.html",
@@ -349,9 +232,9 @@ def complaints_analytics():
     )
 
 
-# -----------------------------
-#    EDIT COMPLAINT STATUS
-# -----------------------------
+# ------------------------------------
+#        EDIT COMPLAINT STATUS
+# ------------------------------------
 @bp.route("/complaints/<int:complaint_id>/status", methods=["GET", "POST"])
 @login_required
 def edit_status(complaint_id):
@@ -372,106 +255,96 @@ def edit_status(complaint_id):
             flash("Status is unchanged!", "info")
             return redirect(url_for("admin.edit_status", complaint_id=complaint_id))
 
-        else:
-            complaint_data = query(
+        complaint_data = query(
+            """
+            SELECT u.email, u.username, c.title, c.department_id
+            FROM complaints c
+            JOIN users u ON c.user_id = u.user_id
+            WHERE c.complaint_id = %s
+            """,
+            (complaint_id,),
+            fetchone=True,
+        )
+
+        staff_id = query(
+            "SELECT staff_id FROM staff WHERE department_id=%s",
+            (complaint_data["department_id"],),
+            fetchone=True,
+        )[0]
+
+        # Send user email
+        send_notification(
+            to=complaint_data["email"],
+            subject="Complaint Status Updated",
+            body=(
+                f"Hello {complaint_data['username']},\n\n"
+                f"Your complaint '{complaint_data['title']}' status changed.\n"
+                f"Old: {old_status}\nNew: {new_status}\n\nRegards,\nAdmin Team"
+            ),
+        )
+
+        # Update DB
+        if new_status == "In Progress":
+            query(
                 """
-                SELECT u.email, u.username, c.title, c.department_id
-                FROM complaints c
-                JOIN users u ON c.user_id = u.user_id
-                WHERE c.complaint_id = %s
+                UPDATE complaints 
+                SET status=%s, assigned_to=%s, admin_comment=%s, assigned_at=NOW()
+                WHERE complaint_id=%s
                 """,
-                (complaint_id,),
-                fetchone=True,
+                (new_status, staff_id, admin_comment, complaint_id),
+                commit=True,
             )
 
-            department_id = complaint_data["department_id"]
-
-            staff_id = query(
+        elif new_status == "Rejected":
+            query(
                 """
-                SELECT staff_id
-                FROM staff  
-                WHERE department_id = %s
+                UPDATE complaints
+                SET status=%s, assigned_to=NULL, assigned_at=NULL, admin_comment=%s
+                WHERE complaint_id=%s
                 """,
-                (department_id,),
-                fetchone=True,
-            )[0]
+                (new_status, admin_comment, complaint_id),
+                commit=True,
+            )
 
-            if complaint_data:
-                send_notification(
-                    to=complaint_data["email"],
-                    subject="Complaint Status Updated",
-                    body=f"Hello {complaint_data['username']},\n\n"
-                    f"Your complaint titled '{complaint_data['title']}' has been updated.\n"
-                    f"Old Status: {old_status}\n"
-                    f"New Status: {new_status}.\n"
-                    f"View your complaint for more details.\n"
-                    f"Regards,\nAdmin Team",
-                )
+        elif new_status == "Resolved":
+            query(
+                """
+                UPDATE complaints
+                SET status=%s, assigned_to=NULL, assigned_at=NULL, resolved_at=NOW(), admin_comment=%s
+                WHERE complaint_id=%s
+                """,
+                (new_status, admin_comment, complaint_id),
+                commit=True,
+            )
 
-            if new_status == "In Progress":
-                query(
-                    "UPDATE complaints SET status=%s, assigned_to=%s, admin_comment=%s, assigned_at=NOW() WHERE complaint_id=%s",
-                    (new_status, staff_id, admin_comment, complaint_id),
-                    commit=True,
-                )
-
-            elif new_status == "Rejected":
-                query(
-                    """
-                    UPDATE complaints
-                    SET status=%s, assigned_to=NULL, assigned_at=NULL, admin_comment=%s
-                    WHERE complaint_id=%s 
-                    """,
-                    (
-                        new_status,
-                        admin_comment,
-                        complaint_id,
-                    ),
-                    commit=True,
-                )
-
-            elif new_status == "Resolved":
-                query(
-                    """
-                    UPDATE complaints
-                    SET status=%s, assigned_to=NULL, assigned_at=NULL, resolved_at=NOW(), admin_comment=%s
-                    WHERE complaint_id=%s 
-                    """,
-                    (
-                        new_status,
-                        admin_comment,
-                        complaint_id,
-                    ),
-                    commit=True,
-                )
-
-            flash("Status updated successfully!", "success")
-            return redirect(url_for("admin.admin_complaints"))
+        flash("Status updated successfully!", "success")
+        return redirect(url_for("admin.admin_complaints"))
 
     comp = query(
-        "SELECT * FROM complaints WHERE complaint_id=%s", (complaint_id,), fetchone=True
+        "SELECT * FROM complaints WHERE complaint_id=%s",
+        (complaint_id,),
+        fetchone=True,
     )
 
     return render_template("admin_edit_status.html", complaint=comp)
 
 
-# ------------------------------
-#       ADMIN ADD COMMENT
-# ------------------------------
+# ------------------------------------
+#           ADD COMMENT
+# ------------------------------------
 @bp.route("/complaints/<int:complaint_id>/add_comment", methods=["POST"])
 @login_required
 def add_comment(complaint_id):
     if not current_user.is_admin:
         abort(403)
 
-    if request.method == "POST":
-        admin_comment = request.form["admin_comment"].strip()
+    admin_comment = request.form["admin_comment"].strip()
 
-        query(
-            "UPDATE complaints SET admin_comment=%s WHERE complaint_id=%s",
-            (admin_comment, complaint_id,),
-            commit=True
-        )
+    query(
+        "UPDATE complaints SET admin_comment=%s WHERE complaint_id=%s",
+        (admin_comment, complaint_id),
+        commit=True,
+    )
 
     flash("Comment updated successfully", "success")
     return redirect(url_for("admin.admin_complaints"))

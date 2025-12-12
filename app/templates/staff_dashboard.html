@@ -156,7 +156,12 @@
                                 {% endif %}
                             </p>
             
-                            <p><strong>Created AT : </strong>{{ c.created_at }}</p>
+                            <p><strong>Created At: </strong>{{ c.created_at }}</p>
+                            <p><strong>Assigned At : </strong>{{ c.assigned_at }}</p>
+
+                            {% if c.resolved_at %}
+                            <p><strong>Resolved At : </strong>{{ c.resolved_at }}</p>
+                            {% endif %}
                             
                             <p><strong>Attachments: </strong></p>
                             {% if c.attachment %}
@@ -167,13 +172,23 @@
                             {% else %}
                                 <p>No file attachments</p>
                             {% endif %}
-            
+                            
+                            <!-- ADMIN COMMENT -->
                             {% if c.admin_comment %}
                                 <div class="mb-2">
                                     <label for="admin_comment" class="form-label"><strong>Admin Comment</strong></label>
                                     <input id="admin_comment" type="text" name="admin_comment" class="form-control mt-1"
                                         value="{{ c.admin_comment or '' }}" disabled>
                                 </div>  
+                            {% endif %}
+
+                            <!-- STAFF COMMENT -->
+                            {% if c.staff_comment %}
+                            <div class="mb-2">
+                                <label for="staff_comment" class="form-label"><strong>Staff Comment</strong></label>
+                                <input id="staff_comment" type="text" name="staff_comment" class="form-control mt-1"
+                                    value="{{ c.staff_comment or '' }}" disabled>
+                            </div>
                             {% endif %}
                         </div>
             

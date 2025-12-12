@@ -135,17 +135,18 @@
                             {% endif %}
                         </p>
 
-                        <p><strong>Created At: </strong> {{ c.created_at }}</p>
+                        <p><strong>Created At : </strong>{{ c.created_at }}</p>
 
                         {% if c.status == "In Progress" %}
-                        <p><strong>Assigned To: </strong> {{ c.assigned_to }}</p>
+                        <p><strong>Assigned To : </strong>{{ c.assigned_to }}</p>
+                        <p><strong>Assigned At : </strong>{{ c.assigned_at }}</p>
                         {% endif %}
 
                         {% if c.resolved_at %}
-                        <p><strong>Resolved At: </strong> {{ c.resolved_at }}</p>
+                        <p><strong>Resolved At : </strong>{{ c.resolved_at }}</p>
                         {% elif c.status == "Rejected" %}
                         {% else %}
-                        <p><strong>Estimated Resolution Time: </strong> Varies by issue type</p>
+                        <p><strong>Estimated Resolution Time : </strong> Varies by issue type</p>
                         {% endif %}
 
                         <p><strong>Attachment:</strong></p>
