@@ -1,18 +1,21 @@
-<!-- CONTACT US -->
+<!-- FILE: contact_us.html -->
 
 {% extends 'base.html' %}
 {% block content %}
-<div class=" mt-5">
+
+<div class="mt-5">
     <h3 class="text-center my-4">CONTACT US</h3>
+
     <form action="{{ url_for('contact.message') }}" method="POST">
+
         <label for="name" class="my-2">Name</label>
-        <input type="text" name="name" class="form-control mb-2" required>
+        <input id="name" type="text" name="name" class="form-control mb-2" required>
 
         <label for="email" class="my-2">Email</label>
-        <input type="email" name="email" class="form-control mb-2" required>
+        <input id="email" type="email" name="email" class="form-control mb-2" required>
 
         <label for="rating" class="my-2">Rating</label>
-        <select name="rating" name="rating" class="form-select mb-2" required>
+        <select id="rating" name="rating" class="form-select mb-2" required>
             <option value="5">5 Stars</option>
             <option value="4">4 Stars</option>
             <option value="3">3 Stars</option>
@@ -21,27 +24,28 @@
         </select>
 
         <label for="message" class="my-2">Message</label>
-        <textarea name="message" name="message" class="form-control mb-2" rows="5" required></textarea>
+        <textarea id="message" name="message" class="form-control mb-2" rows="5" required></textarea>
 
         <button class="btn btn-primary my-3">
             <i class="bi bi-check-circle me-1"></i>
             Send Feedback
         </button>
     </form>
+
     <a href="{{ url_for('home.home') }}" class="btn btn-secondary">
         <i class="bi bi-arrow-left me-1"></i>
         Back
     </a>
 </div>
 
-<!-- FLASH MESSAGES -->
 <div class="flash-messages text-center mt-3">
     {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <p class="{{ category }}">{{ message }}</p>
-            {% endfor %}
-        {% endif %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <p class="{{ category }}">{{ message }}</p>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
 </div>
+
 {% endblock %}

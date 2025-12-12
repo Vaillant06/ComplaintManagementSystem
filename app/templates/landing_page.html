@@ -5,6 +5,7 @@
 <div class="form landing-page text-center p-5">
     <h1>Welcome to Complaint Management System</h1>
     <p >Easily submit, track, and manage complaints with our efficient online portal.</p>
+
     {% if current_user.is_authenticated %}
         {% if current_user.is_user %}
         <div class="redirection mt-3">
@@ -13,10 +14,13 @@
                 Go To Dashboard
             </a>
         </div>
-        {% else %}
+
+        
+        {% endif %}
+    {% else %}
         <div class="redirection mt-3">
             <a href="{{ url_for('auth.login') }}" class="btn btn-success">
-                <i class="bi bi-box-arrow-in-right me-1"></i> 
+                <i class="bi bi-box-arrow-in-right me-1"></i>
                 Login
             </a>
             <a href="{{ url_for('auth.register') }}" class="btn btn-primary mt-3">
@@ -24,7 +28,6 @@
                 Register
             </a>
         </div>
-        {% endif %}
     {% endif %}
 </div>
 
