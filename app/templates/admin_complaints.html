@@ -190,13 +190,15 @@
                             <label for="admin_comment" class="form-label"><strong>Admin Comment: </strong></label>
                             {% if c.admin_comment %}
                             <input type="text" class="form-control mb-3" value="{{ c.admin_comment }}" disabled>
+                            {% elif c.status == "Rejected" %}
+                            <input type="text" class="form-control mb-3" value="{{ c.admin_comment }}" disabled>
                             {% else %}
                             <input type="text" class="form-control mb-3" placeholder="No comments yet!" disabled>
                             {% endif %}
                         </div>
                         <div>
                             <label for="staff_comment" class="form-label"><strong>Staff Comment: </strong></label>
-                            {% if c.staff_comment %}
+                            {% if c.staff_comment or c.status == "Rejected" %}
                             <input type="text" class="form-control mb-3" value="{{ c.staff_comment }}" disabled>
                             {% else %}
                             <input type="text" class="form-control mb-3" placeholder="No comments yet!" disabled>

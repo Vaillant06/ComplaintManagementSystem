@@ -27,7 +27,11 @@
                         value="{{ complaint.admin_comment or '' }}">
                 </div>
                 {% if complaint.status == "In Progress" %}
-                <p class="text-success text-center my-3">Work has been assigned. Waiting to be resolved...</p>
+                <p class="text-success text-center mt-4">
+                    Work has been assigned to staff.
+                    <br>
+                    Status gets updated automatically once resolved...
+                </p>
                 {% endif %}
             </div>
             <div class="redirection">

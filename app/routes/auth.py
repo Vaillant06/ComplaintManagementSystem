@@ -75,7 +75,7 @@ def login():
 
 
         staff = query("SELECT * FROM staff WHERE email=%s", (email,), fetchone=True)    
-        if staff and staff["password"] == password:
+        if staff and bcrypt.check_password_hash(staff["password"], password):
             query(
                 "UPDATE staff SET last_login = NOW() WHERE staff_id = %s",
                 (staff["staff_id"],),

@@ -1,5 +1,6 @@
 from flask import Blueprint, flash, redirect, url_for, render_template, abort, request
 from flask_login import login_required, current_user
+from app.extensions import bcrypt
 from datetime import timedelta
 from app.utils.email import send_notification
 from app.db import query
@@ -155,9 +156,10 @@ def update_status(complaint_id):
             fetchone=True
         )[0]
 
-        if password != staff["password"]:
+        if not bcrypt.check_password_hash(staff["password"], password):
             flash("Password mismatch!", "alert")
             return redirect(url_for("staff.update_status", complaint_id=complaint_id))
+
 
         if old_status == new_status:
             flash("Status Unchanged!", "info")
