@@ -169,7 +169,16 @@
                                 {% endif %}
                             </p>
                             <p><strong>Created At : </strong> {{ c.created_at }}</p>
-                            <p><strong>Resolved At: </strong> {{ c.resolved_at }}</p>
+                            {% if c.status == "In Progress" %}
+                                <p><strong>Assigned To : </strong>{{ c.assigned_to }}</p>
+                            {% endif %}
+                            {% if c.resolved_at %}
+                                <p><strong>Resolved At : </strong> {{ c.resolved_at }}</p>
+                            {% elif c.status == "Rejected" %}
+                                <p><strong>Resolved At : </strong>Not applicable</p>
+                            {% else %}
+                                <p><strong>Estimation Resolution Time : </strong>Varies by issue type</p>
+                            {% endif %}
                             <p><strong>Attachment: </strong></p>
                             {% if c.attachment %}
                             <a href="{{ url_for('static', filename='uploads/' ~ c.attachment) }}" target="_blank"
@@ -185,17 +194,25 @@
                                 {% if c.admin_comment %}
                                 <input type="text" class="form-control mb-3" value="{{ c.admin_comment }}" disabled>
                                 {% else %}
-                                <input type="text" class="form-control mb-3" placeholder="No comments yet!" disabled>
+                                <input type="text" class="form-control mb-3" value="No comments yet!" disabled>
                                 {% endif %}
                             </div>
-                            <div>
-                                <label for="staff_comment" class="form-label"><strong>Staff Comment: </strong></label>
-                                {% if c.staff_comment or c.status == "Rejected" %}
-                                <input type="text" class="form-control mb-3" value="{{ c.staff_comment }}" disabled>
-                                {% else %}
-                                <input type="text" class="form-control mb-3" placeholder="No comments yet!" disabled>
-                                {% endif %}
-                            </div>
+                            {% if c.staff_comment %}
+                                <div>
+                                    <label for="staff_comment" class="form-label"><strong>Staff Comment: </strong></label>
+                                    <input type="text" class="form-control mb-3" value="{{ c.staff_comment }}" disabled>
+                                </div>
+                            {% elif c.status == "Rejected" %}
+                                <div>
+                                    <label for="staff_comment" class="form-label"><strong>Staff Comment: </strong></label>
+                                    <input type="text" class="form-control mb-3" value="None" disabled>
+                                </div>
+                            {% else %}
+                                <div>
+                                    <label for="staff_comment" class="form-label"><strong>Staff Comment: </strong></label>
+                                    <input type="text" class="form-control mb-3" value="No comments yet!" disabled>
+                                </div>
+                            {% endif %}
                         </div>
             
                         <div class="modal-footer">

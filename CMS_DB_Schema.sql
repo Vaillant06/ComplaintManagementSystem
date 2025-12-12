@@ -82,6 +82,21 @@ CREATE TABLE user_review (
 );
 
 
+--7. Log Table
+
+CREATE TABLE audit_log (
+    log_id SERIAL PRIMARY KEY,
+    actor_id TEXT NOT NULL,         
+    role VARCHAR(20) NOT NULL,     
+    complaint_id INTEGER NOT NULL,
+    action VARCHAR(100) NOT NULL,
+    old_value TEXT,
+    new_value TEXT,
+    timestamp TIMESTAMP DEFAULT NOW()
+);
+
+
+
 -- INSERT VALUES
 
 -- 1. FOR ADMIN

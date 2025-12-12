@@ -4,6 +4,11 @@
 {% block content %}
 <div>
 	<h3 class=" text-center m-5">SUBMIT COMPLAINT</h3>
+
+	<h5 class="mb-5">
+		<strong class="text-danger">NOTE : </strong>
+		Please fill in the details accurately so we can resolve your issue quickly.
+	</h5>
 	
 	<form method="POST" enctype="multipart/form-data">
 		<div class="mb-3">
@@ -26,7 +31,7 @@
 			<label>Attachment (optional)</label>
 			<input type="file" name="attachment" class="form-control mt-1" accept="image/*">
 		</div>
-		<button class="btn btn-primary">
+		<button class="btn btn-primary mt-2">
 			<i class="bi bi-check-circle me-1"></i>
 			Submit
 		</button>
