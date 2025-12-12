@@ -70,6 +70,17 @@ CREATE TABLE complaints (
     FOREIGN KEY (assigned_to) REFERENCES staff(staff_id)
 );
 
+--6. USER REVIEW TABLE
+
+CREATE TABLE user_review (
+    name varchar(100) NOT NULL,
+    email varchar(255) NOT NULL,
+    rating varchar(10) NOT NULL,
+    user_message TEXT NOT NULL,
+    admin_reply TEXT,
+    created_at TIMESTAMP
+);
+
 
 -- INSERT VALUES
 
