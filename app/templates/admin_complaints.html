@@ -153,9 +153,15 @@
                         {% endif %}
                     </p>
 
-                    <p><strong>Created At:</strong> {{ c.created_at }}</p>
-                    <p><strong>Assigned At:</strong> {{ c.assigned_at }}</p>
-                    <p><strong>Resolved At:</strong> {{ c.resolved_at }}</p>
+                    <p><strong>Complaint Filed AT :</strong>{{ c.created_at }}</p>
+
+                    {% if c.assigned_at %}
+                    <p><strong>Assigned AT : </strong>{{ c.assigned_at }}</p>
+                    {% endif %}
+
+                    {% if c.resolved_at %}
+                    <p><strong>Resolved AT : </strong>{{ c.resolved_at }}</p>
+                    {% endif %}
 
                     <p><strong>Attachment:</strong></p>
                     {% if c.attachment %}
@@ -175,11 +181,13 @@
                     </div>
 
                     <!-- STAFF COMMENT -->
+                    {% if c.staff_comment %}
                     <div>
                         <label class="form-label"><strong>Staff Comment:</strong></label>
                         <input type="text" class="form-control mb-3" value="{{ c.staff_comment or 'No comments yet!' }}"
                             disabled>
                     </div>
+                    {% endif %}
 
                 </div>
 
