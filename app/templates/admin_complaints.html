@@ -153,14 +153,15 @@
                         {% endif %}
                     </p>
 
-                    <p><strong>Complaint Filed AT :</strong>{{ c.created_at }}</p>
+                    <p><strong>Complaint Filed At :</strong>{{ c.created_at }}</p>
 
                     {% if c.assigned_at %}
-                    <p><strong>Assigned AT : </strong>{{ c.assigned_at }}</p>
+                    <p><strong>Assigned At : </strong>{{ c.assigned_at }}</p>
+                    <p><strong>Assigned To : </strong>{{ c.assigned_to }}</p>
                     {% endif %}
 
                     {% if c.resolved_at %}
-                    <p><strong>Resolved AT : </strong>{{ c.resolved_at }}</p>
+                    <p><strong>Resolved At : </strong>{{ c.resolved_at }}</p>
                     {% endif %}
 
                     <p><strong>Attachment:</strong></p>
