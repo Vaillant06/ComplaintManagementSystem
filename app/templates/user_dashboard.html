@@ -139,6 +139,9 @@
 
                         {% if c.status == "In Progress" %}
                         <p><strong>Assigned To : </strong>{{ c.assigned_to }}</p>
+                        {% endif %}
+
+                        {% if c.assigned_at %}
                         <p><strong>Assigned At : </strong>{{ c.assigned_at }}</p>
                         {% endif %}
 
@@ -157,14 +160,17 @@
                         <p>No attachment uploaded</p>
                         {% endif %}
 
-                        <label class="form-label"><strong>Admin Comment:</strong></label>
-                        <input type="text" class="form-control mb-3" value="{{ c.admin_comment or 'No comments yet!' }}"
-                            disabled>
-
-                        <label class="form-label"><strong>Staff Comment:</strong></label>
-                        <input type="text" class="form-control mb-3"
-                            value="{% if c.staff_comment %}{{ c.staff_comment }}{% elif c.status == 'Rejected' %}None{% else %}No comments yet!{% endif %}"
-                            disabled>
+                        <div>
+                            <label class="form-label"><strong>Admin Comment:</strong></label>
+                            <input type="text" class="form-control mb-3" value="{{ c.admin_comment or 'No comments yet!' }}" disabled>
+                        </div>
+                        
+                        <div>
+                            <label class="form-label"><strong>Staff Comment:</strong></label>
+                            <input type="text" class="form-control mb-3"
+                                value="{% if c.staff_comment %}{{ c.staff_comment }}{% elif c.status == 'Rejected' %}None{% else %}No comments yet!{% endif %}"
+                                disabled>
+                        </div>
                     </div>
 
                     <div class="modal-footer">
@@ -179,7 +185,7 @@
         {% endfor %}
 
         <!-- PAGINATION -->
-        {% if page %}
+        {% if total_pages %}
         <div class="d-flex justify-content-center align-items-center mt-4 mb-5 gap-3">
             {% if page > 1 %}
             <a href="?page={{ page - 1 }}{% if status %}&status={{ status }}{% endif %}"

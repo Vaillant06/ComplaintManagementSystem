@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+
 class UserWrapper(UserMixin):
     def __init__(self, user_id, name, email, role):
         self.id = user_id
